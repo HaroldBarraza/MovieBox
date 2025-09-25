@@ -13,11 +13,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "E:\\BYU\\code\\Next.js\\MovieBox\\MOVIEBOX\\MOVIEBOX.csproj",
+      "projectUniqueName": "E:\\BYU\\code\\Next.js\\MovieBox\\MOVIEBOX.csproj",
       "projectName": "MOVIEBOX",
-      "projectPath": "E:\\BYU\\code\\Next.js\\MovieBox\\MOVIEBOX\\MOVIEBOX.csproj",
+      "projectPath": "E:\\BYU\\code\\Next.js\\MovieBox\\MOVIEBOX.csproj",
       "packagesPath": "C:\\Users\\HAROLD\\.nuget\\packages\\",
-      "outputPath": "E:\\BYU\\code\\Next.js\\MovieBox\\MOVIEBOX\\obj\\",
+      "outputPath": "E:\\BYU\\code\\Next.js\\MovieBox\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\HAROLD\\AppData\\Roaming\\NuGet\\NuGet.Config"
