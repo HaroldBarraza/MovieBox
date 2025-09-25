@@ -1,0 +1,17 @@
+[phases.setup]
+cmds = [
+  "dotnet restore"
+]
+
+[phases.build]
+cmds = [
+  "dotnet build MOVIEBOX.csproj -c Release -o /app"
+]
+
+[phases.install]
+cmds = [
+  "dotnet publish MOVIEBOX.csproj -c Release -o /app"
+]
+
+[start]
+cmd = "dotnet /app/MOVIEBOX.dll --urls=http://0.0.0.0:$PORT"
