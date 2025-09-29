@@ -32,7 +32,6 @@ E:\BYU\code\Next.js\MovieBox\obj\Debug\net9.0\MovieBox.pdb
 E:\BYU\code\Next.js\MovieBox\obj\Debug\net9.0\MovieBox.genruntimeconfig.cache
 E:\BYU\code\Next.js\MovieBox\obj\Debug\net9.0\ref\MovieBox.dll
 E:\BYU\code\Next.js\MovieBox\obj\Debug\net9.0\compressed\rvsnvtlf60-khy4lop6wu.gz
-E:\BYU\code\Next.js\MovieBox\obj\Debug\net9.0\compressed\pi7k12gh6b-bnl4dage60.gz
 E:\BYU\code\Next.js\MovieBox\obj\Debug\net9.0\compressed\7gz67gupxz-bqjiyaj88i.gz
 E:\BYU\code\Next.js\MovieBox\obj\Debug\net9.0\compressed\uqp97paesn-c2jlpeoesf.gz
 E:\BYU\code\Next.js\MovieBox\obj\Debug\net9.0\compressed\yaxgignw22-erw9l3u2r3.gz
@@ -79,3 +78,4 @@ E:\BYU\code\Next.js\MovieBox\obj\Debug\net9.0\compressed\mryqqk4dhf-63fj8s7r0e.g
 E:\BYU\code\Next.js\MovieBox\obj\Debug\net9.0\compressed\sl2lcgwxre-0j3bgjxly4.gz
 E:\BYU\code\Next.js\MovieBox\obj\Debug\net9.0\compressed\z9s6zk0po6-8cdipgkof6.gz
 E:\BYU\code\Next.js\MovieBox\obj\Debug\net9.0\compressed\ies0hh0p4b-8cdipgkof6.gz
+E:\BYU\code\Next.js\MovieBox\obj\Debug\net9.0\compressed\pi7k12gh6b-3q2xz8k9ps.gz
