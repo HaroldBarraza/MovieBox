@@ -1,0 +1,72 @@
+@page "/movies"
+@using MovieBox.Models
+@using MovieBox.Services
+@inject MovieService MovieService
+
+<h1>🎬 Lista de Películas</h1>
+
+<button class="btn btn-success mb-3" @onclick="AddSampleMovie">
+    Agregar Película de Ejemplo
+</button>
+
+@if (movies.Any())
+{
+    <div class="row">
+        @foreach (var movie in movies)
+        {
+            <div class="col-md-4 mb-3">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">@movie.Title</h5>
+                        <h6 class="card-subtitle mb-2 text-muted">
+                            @movie.ReleaseYear - @movie.Genre
+                        </h6>
+                        <p class="card-text">@movie.Description</p>
+                        <p class="card-text">
+                            <small class="text-muted">
+                                Rating: ⭐ @movie.Rating/10
+                            </small>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}
+else
+{
+    <div class="alert alert-info">
+        No hay películas. Haz clic en el botón para agregar una de ejemplo.
+    </div>
+}
+
+@code {
+    private List<Movie> movies = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadMovies();
+    }
+
+    private async Task LoadMovies()
+    {
+        movies = await MovieService.GetAllMoviesAsync();
+        StateHasChanged();
+    }
+
+    private async Task AddSampleMovie()
+    {
+        var newMovie = new Movie
+        {
+            Title = "Película de Ejemplo " + DateTime.Now.ToString("HH:mm:ss"),
+            Description = "Esta es una película de prueba agregada desde la aplicación.",
+            ReleaseYear = DateTime.Now.Year,
+            Genre = "Drama",
+            Rating = 7.5m,
+            ImageUrl = ""
+        };
+
+        await MovieService.CreateMovieAsync(newMovie);
+        await LoadMovies(); // Recargar la lista
+    }
+}

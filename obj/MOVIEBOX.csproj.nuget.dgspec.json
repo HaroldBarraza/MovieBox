@@ -1,15 +1,15 @@
 {
   "format": 1,
   "restore": {
-    "E:\\BYU\\code\\Next.js\\MovieBox\\MOVIEBOX.csproj": {}
+    "E:\\BYU\\code\\Next.js\\MovieBox\\MovieBox.csproj": {}
   },
   "projects": {
-    "E:\\BYU\\code\\Next.js\\MovieBox\\MOVIEBOX.csproj": {
+    "E:\\BYU\\code\\Next.js\\MovieBox\\MovieBox.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "E:\\BYU\\code\\Next.js\\MovieBox\\MOVIEBOX.csproj",
-        "projectName": "MOVIEBOX",
-        "projectPath": "E:\\BYU\\code\\Next.js\\MovieBox\\MOVIEBOX.csproj",
+        "projectUniqueName": "E:\\BYU\\code\\Next.js\\MovieBox\\MovieBox.csproj",
+        "projectName": "MovieBox",
+        "projectPath": "E:\\BYU\\code\\Next.js\\MovieBox\\MovieBox.csproj",
         "packagesPath": "C:\\Users\\HAROLD\\.nuget\\packages\\",
         "outputPath": "E:\\BYU\\code\\Next.js\\MovieBox\\obj\\",
         "projectStyle": "PackageReference",
@@ -43,6 +43,22 @@
       "frameworks": {
         "net9.0": {
           "targetAlias": "net9.0",
+          "dependencies": {
+            "Microsoft.EntityFrameworkCore": {
+              "target": "Package",
+              "version": "[9.0.9, )"
+            },
+            "Microsoft.EntityFrameworkCore.Design": {
+              "include": "Runtime, Build, Native, ContentFiles, Analyzers, BuildTransitive",
+              "suppressParent": "All",
+              "target": "Package",
+              "version": "[9.0.9, )"
+            },
+            "Npgsql.EntityFrameworkCore.PostgreSQL": {
+              "target": "Package",
+              "version": "[9.0.4, )"
+            }
+          },
           "imports": [
             "net461",
             "net462",
