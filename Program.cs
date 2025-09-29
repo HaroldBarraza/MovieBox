@@ -9,22 +9,18 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
-// Configurar base de datos
+// Cargar variables desde .env
+LoadEnvFile();
+
+// Usar DATABASE_PUBLIC_URL siempre
 var railwayUrl = Environment.GetEnvironmentVariable("DATABASE_PUBLIC_URL");
 if (!string.IsNullOrEmpty(railwayUrl))
 {
-    // PRODUCCIÓN - Usar PostgreSQL de Railway
     var connectionString = ConvertRailwayUrlToConnectionString(railwayUrl);
     builder.Services.AddDbContext<AppDbContext>(options =>
         options.UseNpgsql(connectionString));
     
-    // Reactivar MovieService solo en producción
     builder.Services.AddScoped<MovieService>();
-}
-else
-{
-    // DESARROLLO - No usar base de datos por ahora
-    // builder.Services.AddScoped<MovieService>(); // Mantener comentado localmente
 }
 
 var app = builder.Build();
@@ -57,4 +53,20 @@ string ConvertRailwayUrlToConnectionString(string railwayUrl)
     var password = userInfo[1];
     
     return $"Host={host};Port={port};Database={database};Username={username};Password={password}";
+}
+
+void LoadEnvFile()
+{
+    var envFilePath = Path.Combine(Directory.GetCurrentDirectory(), ".env");
+    if (File.Exists(envFilePath))
+    {
+        foreach (var line in File.ReadAllLines(envFilePath))
+        {
+            var parts = line.Split('=', 2);
+            if (parts.Length == 2)
+            {
+                Environment.SetEnvironmentVariable(parts[0].Trim(), parts[1].Trim());
+            }
+        }
+    }
 }
