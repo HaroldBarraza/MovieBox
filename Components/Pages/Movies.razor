@@ -60,10 +60,6 @@ else
         {
             Title = "Película de Ejemplo " + DateTime.Now.ToString("HH:mm:ss"),
             Description = "Esta es una película de prueba agregada desde la aplicación.",
-            ReleaseYear = DateTime.Now.Year,
-            Genre = "Drama",
-            Rating = 7.5m,
-            ImageUrl = ""
         };
 
         await MovieService.CreateMovieAsync(newMovie);
