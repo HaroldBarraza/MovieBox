@@ -1,8 +1,15 @@
 FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 WORKDIR /src
+
+# Copiar archivos del proyecto
+COPY *.sln .
+COPY *.csproj .
+RUN dotnet restore
+
+# Copiar el resto del código
 COPY . .
-RUN dotnet restore "MOVIEBOX.csproj"
-RUN dotnet publish "MOVIEBOX.csproj" -c Release -o /app/publish
+WORKDIR /src
+RUN dotnet publish -c Release -o /app/publish
 
 FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS final
 WORKDIR /app
