@@ -5,9 +5,4 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <RootNamespace>MovieBox</RootNamespace>
   </PropertyGroup>
-
-  <ItemGroup>
-    <Content Include="appsettings.json" CopyToOutputDirectory="Always" />
-    <Content Include="appsettings.Development.json" CopyToOutputDirectory="Always" />
-  </ItemGroup>
 </Project>
