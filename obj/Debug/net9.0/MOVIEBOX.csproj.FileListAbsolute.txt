@@ -77,3 +77,5 @@ E:\BYU\code\Next.js\MovieBox\obj\Debug\net9.0\refint\MovieBox.dll
 E:\BYU\code\Next.js\MovieBox\obj\Debug\net9.0\MovieBox.pdb
 E:\BYU\code\Next.js\MovieBox\obj\Debug\net9.0\MovieBox.genruntimeconfig.cache
 E:\BYU\code\Next.js\MovieBox\obj\Debug\net9.0\ref\MovieBox.dll
+E:\BYU\code\Next.js\MovieBox\bin\Debug\net9.0\rewrites.json
+E:\BYU\code\Next.js\MovieBox\obj\Debug\net9.0\compressed\28bzxx40p6-bnl4dage60.gz
