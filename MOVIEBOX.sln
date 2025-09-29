@@ -1,24 +1,34 @@
+﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.5.2.0
+VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MOVIEBOX", "MOVIEBOX.csproj", "{BEFBA268-CDD5-E9DF-5DAE-5DD469293EF8}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MovieBox", "MovieBox\MovieBox.csproj", "{3031D413-F6A3-4E43-BE1C-FA298628F3EB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
+		Debug|x64 = Debug|x64
+		Debug|x86 = Debug|x86
 		Release|Any CPU = Release|Any CPU
+		Release|x64 = Release|x64
+		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{BEFBA268-CDD5-E9DF-5DAE-5DD469293EF8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{BEFBA268-CDD5-E9DF-5DAE-5DD469293EF8}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{BEFBA268-CDD5-E9DF-5DAE-5DD469293EF8}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{BEFBA268-CDD5-E9DF-5DAE-5DD469293EF8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3031D413-F6A3-4E43-BE1C-FA298628F3EB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3031D413-F6A3-4E43-BE1C-FA298628F3EB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3031D413-F6A3-4E43-BE1C-FA298628F3EB}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{3031D413-F6A3-4E43-BE1C-FA298628F3EB}.Debug|x64.Build.0 = Debug|Any CPU
+		{3031D413-F6A3-4E43-BE1C-FA298628F3EB}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{3031D413-F6A3-4E43-BE1C-FA298628F3EB}.Debug|x86.Build.0 = Debug|Any CPU
+		{3031D413-F6A3-4E43-BE1C-FA298628F3EB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3031D413-F6A3-4E43-BE1C-FA298628F3EB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3031D413-F6A3-4E43-BE1C-FA298628F3EB}.Release|x64.ActiveCfg = Release|Any CPU
+		{3031D413-F6A3-4E43-BE1C-FA298628F3EB}.Release|x64.Build.0 = Release|Any CPU
+		{3031D413-F6A3-4E43-BE1C-FA298628F3EB}.Release|x86.ActiveCfg = Release|Any CPU
+		{3031D413-F6A3-4E43-BE1C-FA298628F3EB}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
-	EndGlobalSection
-	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {B319361D-BCA8-4753-80AB-2D082181A189}
 	EndGlobalSection
 EndGlobal

@@ -1,4 +1,4 @@
-using MOVIEBOX.Components;
+using MovieBox.Components;
 
 var builder = WebApplication.CreateBuilder(args);
 

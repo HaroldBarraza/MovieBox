@@ -10,12 +10,12 @@
 using System;
 using System.Reflection;
 
-[assembly: System.Reflection.AssemblyCompanyAttribute("MOVIEBOX")]
+[assembly: System.Reflection.AssemblyCompanyAttribute("MovieBox")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+26cb7a0aa00d53953916be22502f118c56edf3ce")]
-[assembly: System.Reflection.AssemblyProductAttribute("MOVIEBOX")]
-[assembly: System.Reflection.AssemblyTitleAttribute("MOVIEBOX")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+bcfb81d9c3a03c9baf6f88c3ef6f461faeb36490")]
+[assembly: System.Reflection.AssemblyProductAttribute("MovieBox")]
+[assembly: System.Reflection.AssemblyTitleAttribute("MovieBox")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
 
 // Generado por la clase WriteCodeFragment de MSBuild.

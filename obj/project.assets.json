@@ -13,9 +13,9 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "E:\\BYU\\code\\Next.js\\MovieBox\\MOVIEBOX.csproj",
-      "projectName": "MOVIEBOX",
-      "projectPath": "E:\\BYU\\code\\Next.js\\MovieBox\\MOVIEBOX.csproj",
+      "projectUniqueName": "E:\\BYU\\code\\Next.js\\MovieBox\\MovieBox.csproj",
+      "projectName": "MovieBox",
+      "projectPath": "E:\\BYU\\code\\Next.js\\MovieBox\\MovieBox.csproj",
       "packagesPath": "C:\\Users\\HAROLD\\.nuget\\packages\\",
       "outputPath": "E:\\BYU\\code\\Next.js\\MovieBox\\obj\\",
       "projectStyle": "PackageReference",
