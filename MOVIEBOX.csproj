@@ -1,5 +1,4 @@
 <Project Sdk="Microsoft.NET.Sdk.Web">
-
   <PropertyGroup>
     <TargetFramework>net9.0</TargetFramework>
     <Nullable>enable</Nullable>
@@ -7,4 +6,8 @@
     <RootNamespace>MovieBox</RootNamespace>
   </PropertyGroup>
 
+  <ItemGroup>
+    <Content Include="appsettings.json" CopyToOutputDirectory="Always" />
+    <Content Include="appsettings.Development.json" CopyToOutputDirectory="Always" />
+  </ItemGroup>
 </Project>
