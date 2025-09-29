@@ -1,0 +1,18 @@
+[phases.setup]
+cmds = [
+    "curl -sSL https://dot.net/v1/dotnet-install.sh | bash /dev/stdin --channel 9.0 --install-dir /usr/local/bin/dotnet",
+]
+
+[phases.build]
+cmds = [
+    "export PATH=/usr/local/bin/dotnet:$PATH",
+    "dotnet restore MOVIEBOX.csproj",
+    "dotnet publish MOVIEBOX.csproj -c Release -o /app"
+]
+
+[start]
+cmd = "dotnet /app/MOVIEBOX.dll --urls http://0.0.0.0:$PORT"
+
+[build.env]
+DOTNET_ROOT = "/usr/local/bin/dotnet"
+PATH = "/usr/local/bin/dotnet:$PATH"
