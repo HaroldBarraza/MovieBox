@@ -3,6 +3,8 @@
 @using MovieBox.Services
 @inject MovieService MovieService
 
+<PageTitle>MovieBox - Películas</PageTitle>
+
 <h1>🎬 Lista de Películas</h1>
 
 <button class="btn btn-success mb-3" @onclick="AddSampleMovie">
@@ -18,11 +20,8 @@
                 <div class="card">
                     <div class="card-body">
                         <h5 class="card-title">@movie.Title</h5>
-                        <h6 class="card-subtitle mb-2 text-muted">
-                        </h6>
                         <p class="card-text">@movie.Description</p>
-                        <p class="card-text">
-                        </p>
+                        <small class="text-muted">ID: @movie.Id</small>
                     </div>
                 </div>
             </div>
@@ -55,10 +54,10 @@ else
         var newMovie = new Movie
         {
             Title = "Película de Ejemplo " + DateTime.Now.ToString("HH:mm:ss"),
-            Description = "Esta es una película de prueba agregada desde la aplicación.",
+            Description = "Esta es una película de prueba agregada desde la aplicación."
         };
 
         await MovieService.CreateMovieAsync(newMovie);
-        await LoadMovies(); // Recargar la lista
+        await LoadMovies();
     }
 }

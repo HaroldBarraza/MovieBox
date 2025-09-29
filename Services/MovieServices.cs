@@ -35,19 +35,6 @@ public class MovieService
         return movie;
     }
     
-    // Actualizar una película existente
-    public async Task<Movie?> UpdateMovieAsync(int id, Movie updatedMovie)
-    {
-        var movie = await _context.Movies.FindAsync(id);
-        if (movie == null) return null;
-        
-        movie.Title = updatedMovie.Title;
-        movie.Description = updatedMovie.Description;
-        
-        await _context.SaveChangesAsync();
-        return movie;
-    }
-    
     // Eliminar una película
     public async Task<bool> DeleteMovieAsync(int id)
     {
@@ -58,13 +45,4 @@ public class MovieService
         await _context.SaveChangesAsync();
         return true;
     }
-    
-    // Buscar películas por título
-    public async Task<List<Movie>> SearchMoviesAsync(string searchTerm)
-    {
-        return await _context.Movies
-            .Where(m => m.Title.Contains(searchTerm) || m.Description.Contains(searchTerm))
-            .ToListAsync();
-    }
-    
 }

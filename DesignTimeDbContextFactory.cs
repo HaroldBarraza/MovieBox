@@ -1,4 +1,3 @@
-// Data/DesignTimeDbContextFactory.cs
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 
@@ -9,8 +8,9 @@ public class DesignTimeDbContextFactory : IDesignTimeDbContextFactory<AppDbConte
     public AppDbContext CreateDbContext(string[] args)
     {
         var optionsBuilder = new DbContextOptionsBuilder<AppDbContext>();
-        var connectionString = Environment.GetEnvironmentVariable("DATABASE_PUBLIC_URL") 
-            ?? "Host=localhost;Database=moviebox;Username=postgres;Password=password";
+        
+        // Tu connection string convertida de Railway
+        var connectionString = "Host=maglev.proxy.rlwy.net;Port=31543;Database=railway;Username=postgres;Password=RZoFDldrPfTiaSwKojxDeTXADUWRSUNE";
         
         optionsBuilder.UseNpgsql(connectionString);
         
