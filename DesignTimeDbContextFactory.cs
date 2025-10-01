@@ -9,7 +9,7 @@ public class DesignTimeDbContextFactory : IDesignTimeDbContextFactory<AppDbConte
     {
         var optionsBuilder = new DbContextOptionsBuilder<AppDbContext>();
         
-        // Tu connection string convertida de Railway
+        // connection string convertida de Railway
         var connectionString = "Host=maglev.proxy.rlwy.net;Port=31543;Database=railway;Username=postgres;Password=RZoFDldrPfTiaSwKojxDeTXADUWRSUNE";
         
         optionsBuilder.UseNpgsql(connectionString);

@@ -51,7 +51,7 @@ public async Task<Movie> CreateMovieAsync(Movie movie)
     }
 }
 
-    // NUEVO: Método para actualizar película
+    //Método para actualizar película
     public async Task<Movie?> UpdateMovieAsync(int id, Movie updatedMovie)
     {
         var movie = await _context.Movies.FindAsync(id);

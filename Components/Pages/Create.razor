@@ -68,7 +68,7 @@
     private bool isSearching = false;
     private System.Threading.CancellationTokenSource? searchCancellationTokenSource;
 
-    // SOLO UN método OnSearchInput - ELIMINA el otro
+
     private async Task OnSearchInput(ChangeEventArgs e)
     {
         searchTitle = e.Value?.ToString() ?? "";
@@ -102,25 +102,32 @@
     }
 
     private void SelectSuggestion(MovieSuggestion suggestion)
-    {
-        newMovie.Title = suggestion.Name;
-        newMovie.Description = suggestion.wTeaser;
-        suggestions.Clear();
-        searchTitle = string.Empty;
-        StateHasChanged();
-    }
-
-    private async Task CreateMovie()
-    {
+        {
+            newMovie.Title = suggestion.Name;
+            newMovie.Description = suggestion.wTeaser;
+            suggestions.Clear();
+            searchTitle = string.Empty;
+            StateHasChanged();
+        }
+    
+        private async Task CreateMovie()
+        {
+        Console.WriteLine("=== BOTÓN CREAR PELÍCULA PRESIONADO ===");
+        
         if (string.IsNullOrWhiteSpace(newMovie.Title))
         {
+            Console.WriteLine("ERROR: Título vacío");
             return;
         }
-
+    
+        Console.WriteLine($"Creando película: {newMovie.Title}");
         await MovieService.CreateMovieAsync(newMovie);
+        Console.WriteLine("Película creada (en teoría)");
         
         newMovie = new Movie();
         searchTitle = string.Empty;
         suggestions.Clear();
-    }
+        
+        Console.WriteLine("Formulario limpiado");
+    }   
 }
