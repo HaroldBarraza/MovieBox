@@ -4,16 +4,15 @@
 @inject MovieService MovieService
 @inject TasteDiveService TasteDiveService
 
-
 <h1>🎬 Crear Nueva Película</h1>
 
 <div class="row">
     <div class="col-md-6">
         <div class="mb-3">
             <label for="movieTitle" class="form-label">Título de la Película</label>
-            <input @bind="searchTitle" @bind:event="oninput" 
-                   class="form-control" id="movieTitle" 
-                   placeholder="Escribe el título para buscar sugerencias..." />
+            <input @bind="searchTitle" @oninput="OnSearchInput" 
+                class="form-control" id="movieTitle" 
+                placeholder="Escribe el título para buscar sugerencias..." />
         </div>
 
         @if (isSearching)
@@ -69,8 +68,11 @@
     private bool isSearching = false;
     private System.Threading.CancellationTokenSource? searchCancellationTokenSource;
 
-    private async Task OnSearchInput()
+    // SOLO UN método OnSearchInput - ELIMINA el otro
+    private async Task OnSearchInput(ChangeEventArgs e)
     {
+        searchTitle = e.Value?.ToString() ?? "";
+        
         if (string.IsNullOrWhiteSpace(searchTitle) || searchTitle.Length < 3)
         {
             suggestions.Clear();
@@ -86,11 +88,11 @@
         try
         {
             await Task.Delay(500, searchCancellationTokenSource.Token);
-            
             suggestions = await TasteDiveService.GetMovieSuggestionsAsync(searchTitle);
         }
         catch (TaskCanceledException)
         {
+            // Búsqueda cancelada
         }
         finally
         {

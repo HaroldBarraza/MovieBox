@@ -16,7 +16,7 @@ builder.Services.AddScoped<TasteDiveService>();
 // Cargar variables desde .env
 LoadEnvFile();
 
-// Configurar base de datos - SIEMPRE registrar los servicios
+// Configurar base de datos - SOLO UNA VEZ
 var railwayUrl = Environment.GetEnvironmentVariable("DATABASE_PUBLIC_URL");
 
 if (!string.IsNullOrEmpty(railwayUrl))
@@ -33,7 +33,7 @@ else
         options.UseSqlite("Data Source=moviebox.db"));
 }
 
-// SIEMPRE registrar MovieService - tanto en desarrollo como producción
+// SIEMPRE registrar MovieService
 builder.Services.AddScoped<MovieService>();
 
 var app = builder.Build();

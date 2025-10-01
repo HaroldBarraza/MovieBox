@@ -25,12 +25,31 @@ public class MovieService
         return await _context.Movies.FindAsync(id);
     }
 
-    public async Task<Movie> CreateMovieAsync(Movie movie)
+public async Task<Movie> CreateMovieAsync(Movie movie)
+{
+    try
     {
+        Console.WriteLine($"=== INTENTANDO CREAR PELÍCULA ===");
+        Console.WriteLine($"Título: {movie.Title}");
+        Console.WriteLine($"Descripción: {movie.Description}");
+        
         _context.Movies.Add(movie);
-        await _context.SaveChangesAsync();
+        var result = await _context.SaveChangesAsync();
+        
+        Console.WriteLine($"=== PELÍCULA CREADA EXITOSAMENTE ===");
+        Console.WriteLine($"ID asignado: {movie.Id}");
+        Console.WriteLine($"Filas afectadas: {result}");
+        
         return movie;
     }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"=== ERROR CREANDO PELÍCULA ===");
+        Console.WriteLine($"Mensaje: {ex.Message}");
+        Console.WriteLine($"Stack: {ex.StackTrace}");
+        throw;
+    }
+}
 
     // NUEVO: Método para actualizar película
     public async Task<Movie?> UpdateMovieAsync(int id, Movie updatedMovie)
