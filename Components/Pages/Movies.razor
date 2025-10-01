@@ -1,27 +1,40 @@
 @page "/movies"
 @using MovieBox.Models
 @using MovieBox.Services
+@inject NavigationManager NavigationManager
+@inject IJSRuntime JSRuntime
 @inject MovieService MovieService
 
 <PageTitle>MovieBox - Películas</PageTitle>
 
 <h1>🎬 Lista de Películas</h1>
 
-<button class="btn btn-success mb-3" @onclick="AddSampleMovie">
-    Agregar Película de Ejemplo
-</button>
+<div class="mb-3">
+    <a href="/create" class="btn btn-success">
+        <i class="bi bi-plus-circle"></i> Crear Nueva Película
+    </a>
+</div>
 
 @if (movies.Any())
 {
     <div class="row">
         @foreach (var movie in movies)
         {
-            <div class="col-md-4 mb-3">
+            <div class="col-md-6 mb-3">
                 <div class="card">
                     <div class="card-body">
                         <h5 class="card-title">@movie.Title</h5>
                         <p class="card-text">@movie.Description</p>
                         <small class="text-muted">ID: @movie.Id</small>
+                        
+                        <div class="mt-3">
+                            <button class="btn btn-warning btn-sm" @onclick="() => EditMovie(movie.Id)">
+                                <i class="bi bi-pencil"></i> Editar
+                            </button>
+                            <button class="btn btn-danger btn-sm ms-2" @onclick="() => DeleteMovie(movie.Id)">
+                                <i class="bi bi-trash"></i> Eliminar
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -31,7 +44,7 @@
 else
 {
     <div class="alert alert-info">
-        No hay películas. Haz clic en el botón para agregar una de ejemplo.
+        No hay películas. <a href="/create" class="alert-link">Crea una nueva película</a> para comenzar.
     </div>
 }
 
@@ -49,15 +62,19 @@ else
         StateHasChanged();
     }
 
-    private async Task AddSampleMovie()
+    private void EditMovie(int id)
     {
-        var newMovie = new Movie
-        {
-            Title = "Película de Ejemplo " + DateTime.Now.ToString("HH:mm:ss"),
-            Description = "Esta es una película de prueba agregada desde la aplicación."
-        };
+        // Navegar a la página de edición
+        NavigationManager.NavigateTo($"/edit/{id}");
+    }
 
-        await MovieService.CreateMovieAsync(newMovie);
-        await LoadMovies();
+    private async Task DeleteMovie(int id)
+    {
+        var confirmed = await JSRuntime.InvokeAsync<bool>("confirm", "¿Estás seguro de que quieres eliminar esta película?");
+        if (confirmed)
+        {
+            await MovieService.DeleteMovieAsync(id);
+            await LoadMovies(); // Recargar la lista
+        }
     }
 }

@@ -9,19 +9,32 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
+// Add HttpClient para TasteDive
+builder.Services.AddHttpClient<TasteDiveService>();
+builder.Services.AddScoped<TasteDiveService>();
+
 // Cargar variables desde .env
 LoadEnvFile();
 
-// Usar DATABASE_PUBLIC_URL siempre
+// Configurar base de datos - SIEMPRE registrar los servicios
 var railwayUrl = Environment.GetEnvironmentVariable("DATABASE_PUBLIC_URL");
+
 if (!string.IsNullOrEmpty(railwayUrl))
 {
+    // PRODUCCIÓN - Usar PostgreSQL de Railway
     var connectionString = ConvertRailwayUrlToConnectionString(railwayUrl);
     builder.Services.AddDbContext<AppDbContext>(options =>
         options.UseNpgsql(connectionString));
-    
-    builder.Services.AddScoped<MovieService>();
 }
+else
+{
+    // DESARROLLO LOCAL - Usar SQLite
+    builder.Services.AddDbContext<AppDbContext>(options =>
+        options.UseSqlite("Data Source=moviebox.db"));
+}
+
+// SIEMPRE registrar MovieService - tanto en desarrollo como producción
+builder.Services.AddScoped<MovieService>();
 
 var app = builder.Build();
 

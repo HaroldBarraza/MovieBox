@@ -13,7 +13,6 @@ public class MovieService
         _context = context;
     }
     
-    // Obtener todas las películas
     public async Task<List<Movie>> GetAllMoviesAsync()
     {
         return await _context.Movies
@@ -21,21 +20,31 @@ public class MovieService
             .ToListAsync();
     }
     
-    // Obtener una película por ID
     public async Task<Movie?> GetMovieAsync(int id)
     {
         return await _context.Movies.FindAsync(id);
     }
-    
-    // Crear una nueva película
+
     public async Task<Movie> CreateMovieAsync(Movie movie)
     {
         _context.Movies.Add(movie);
         await _context.SaveChangesAsync();
         return movie;
     }
-    
-    // Eliminar una película
+
+    // NUEVO: Método para actualizar película
+    public async Task<Movie?> UpdateMovieAsync(int id, Movie updatedMovie)
+    {
+        var movie = await _context.Movies.FindAsync(id);
+        if (movie == null) return null;
+
+        movie.Title = updatedMovie.Title;
+        movie.Description = updatedMovie.Description;
+        
+        await _context.SaveChangesAsync();
+        return movie;
+    }
+
     public async Task<bool> DeleteMovieAsync(int id)
     {
         var movie = await _context.Movies.FindAsync(id);

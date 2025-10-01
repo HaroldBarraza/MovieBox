@@ -1,0 +1,64 @@
+@page "/edit/{id:int}"
+@using MovieBox.Models
+@using MovieBox.Services
+@inject MovieService MovieService
+@inject NavigationManager NavigationManager
+
+
+<h1>✏️ Editar Película</h1>
+
+@if (movie != null)
+{
+    <div class="row">
+        <div class="col-md-6">
+            <div class="mb-3">
+                <label class="form-label">Título</label>
+                <input @bind="movie.Title" class="form-control" />
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Descripción</label>
+                <textarea @bind="movie.Description" class="form-control" rows="4"></textarea>
+            </div>
+
+            <div class="mb-3">
+                <button class="btn btn-primary" @onclick="UpdateMovie">
+                    <i class="bi bi-check-circle"></i> Actualizar
+                </button>
+                <a href="/movies" class="btn btn-secondary ms-2">
+                    <i class="bi bi-arrow-left"></i> Cancelar
+                </a>
+            </div>
+        </div>
+    </div>
+}
+else
+{
+    <div class="alert alert-warning">
+        Cargando película...
+    </div>
+}
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+
+    private Movie? movie;
+
+    protected override async Task OnInitializedAsync()
+    {
+        movie = await MovieService.GetMovieAsync(Id);
+    }
+
+    private async Task UpdateMovie()
+    {
+        if (movie != null && !string.IsNullOrWhiteSpace(movie.Title))
+        {
+            var updatedMovie = await MovieService.UpdateMovieAsync(Id, movie);
+            if (updatedMovie != null)
+            {
+                NavigationManager.NavigateTo("/movies");
+            }
+        }
+    }
+}

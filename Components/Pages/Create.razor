@@ -1,0 +1,124 @@
+@page "/create"
+@using MovieBox.Models
+@using MovieBox.Services
+@inject MovieService MovieService
+@inject TasteDiveService TasteDiveService
+
+
+<h1>🎬 Crear Nueva Película</h1>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="mb-3">
+            <label for="movieTitle" class="form-label">Título de la Película</label>
+            <input @bind="searchTitle" @bind:event="oninput" 
+                   class="form-control" id="movieTitle" 
+                   placeholder="Escribe el título para buscar sugerencias..." />
+        </div>
+
+        @if (isSearching)
+        {
+            <div class="alert alert-info">Buscando sugerencias...</div>
+        }
+
+        @if (suggestions.Any())
+        {
+            <div class="suggestions-container">
+                <h5>Sugerencias:</h5>
+                @foreach (var suggestion in suggestions)
+                {
+                    <div class="card mb-2 suggestion-card" 
+                         @onclick="() => SelectSuggestion(suggestion)">
+                        <div class="card-body">
+                            <h6 class="card-title">@suggestion.Name</h6>
+                            <p class="card-text small text-muted">
+                                @(suggestion.wTeaser.Length > 150 ? 
+                                  suggestion.wTeaser.Substring(0, 150) + "..." : 
+                                  suggestion.wTeaser)
+                            </p>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+    </div>
+
+    <div class="col-md-6">
+        <h4>Detalles de la Película</h4>
+        
+        <div class="mb-3">
+            <label class="form-label">Título</label>
+            <input @bind="newMovie.Title" class="form-control" />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Descripción</label>
+            <textarea @bind="newMovie.Description" class="form-control" rows="4"></textarea>
+        </div>
+
+        <button class="btn btn-success" @onclick="CreateMovie">
+            Guardar Película
+        </button>
+    </div>
+</div>
+
+@code {
+    private Movie newMovie = new();
+    private string searchTitle = string.Empty;
+    private List<MovieSuggestion> suggestions = new();
+    private bool isSearching = false;
+    private System.Threading.CancellationTokenSource? searchCancellationTokenSource;
+
+    private async Task OnSearchInput()
+    {
+        if (string.IsNullOrWhiteSpace(searchTitle) || searchTitle.Length < 3)
+        {
+            suggestions.Clear();
+            return;
+        }
+
+        searchCancellationTokenSource?.Cancel();
+        searchCancellationTokenSource = new System.Threading.CancellationTokenSource();
+
+        isSearching = true;
+        StateHasChanged();
+
+        try
+        {
+            await Task.Delay(500, searchCancellationTokenSource.Token);
+            
+            suggestions = await TasteDiveService.GetMovieSuggestionsAsync(searchTitle);
+        }
+        catch (TaskCanceledException)
+        {
+        }
+        finally
+        {
+            isSearching = false;
+            StateHasChanged();
+        }
+    }
+
+    private void SelectSuggestion(MovieSuggestion suggestion)
+    {
+        newMovie.Title = suggestion.Name;
+        newMovie.Description = suggestion.wTeaser;
+        suggestions.Clear();
+        searchTitle = string.Empty;
+        StateHasChanged();
+    }
+
+    private async Task CreateMovie()
+    {
+        if (string.IsNullOrWhiteSpace(newMovie.Title))
+        {
+            return;
+        }
+
+        await MovieService.CreateMovieAsync(newMovie);
+        
+        newMovie = new Movie();
+        searchTitle = string.Empty;
+        suggestions.Clear();
+    }
+}
