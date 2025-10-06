@@ -1,0 +1,290 @@
+@page "/movies"
+@rendermode InteractiveServer
+@using MovieBox.Models
+@using MovieBox.Services
+@inject MovieService MovieService
+@inject IJSRuntime JS
+
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h3>Gestión de Películas</h3>
+        <button class="btn btn-primary" @onclick="ShowCreateModal">
+            <span class="oi oi-plus"></span> Nueva Película
+        </button>
+    </div>
+
+    <!-- Barra de búsqueda -->
+    <div class="row mb-3">
+        <div class="col-md-6">
+            <div class="input-group">
+                <input type="text" class="form-control" placeholder="Buscar por título o descripción..." 
+                       @bind="searchTerm" @bind:event="oninput" />
+                <button class="btn btn-outline-secondary" @onclick="HandleSearch">
+                    <span class="oi oi-magnifying-glass"></span> Buscar
+                </button>
+                <button class="btn btn-outline-info" @onclick="HandleClearSearch">
+                    <span class="oi oi-x"></span> Limpiar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    @if (movies == null)
+    {
+        <div class="text-center">
+            <div class="spinner-border" role="status">
+                <span class="visually-hidden">Cargando...</span>
+            </div>
+        </div>
+    }
+    else if (!movies.Any())
+    {
+        <div class="alert alert-info">
+            @(string.IsNullOrEmpty(searchTerm) 
+                ? "No hay películas registradas. ¡Agrega la primera!" 
+                : "No se encontraron películas que coincidan con la búsqueda.")
+        </div>
+    }
+    else
+    {
+        <div class="table-responsive">
+            <table class="table table-striped table-hover">
+                <thead class="table-dark">
+                    <tr>
+                        <th>ID</th>
+                        <th>Título</th>
+                        <th>Descripción</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var movie in movies)
+                    {
+                        <tr>
+                            <td>@movie.Id</td>
+                            <td>
+                                <strong>@movie.Title</strong>
+                            </td>
+                            <td>
+                                @if (!string.IsNullOrEmpty(movie.Description))
+                                {
+                                    @movie.Description
+                                }
+                                else
+                                {
+                                    <span class="text-muted">Sin descripción</span>
+                                }
+                            </td>
+                            <td>
+                                <button class="btn btn-sm btn-warning" @onclick="() => ShowEditModal(movie)">
+                                    <span class="oi oi-pencil"></span> Editar
+                                </button>
+                                <button class="btn btn-sm btn-danger ms-1" @onclick="() => DeleteMovie(movie.Id)">
+                                    <span class="oi oi-trash"></span> Eliminar
+                                </button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>
+
+<!-- Modal para Crear/Editar -->
+@if (showModal)
+{
+    <div class="modal show d-block" style="background-color: rgba(0,0,0,0.5);" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">@(currentMovie.Id == 0 ? "Agregar Película" : "Editar Película")</h5>
+                    <button type="button" class="btn-close" @onclick="CloseModal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Título *</label>
+                        <input type="text" class="form-control" @bind="currentMovie.Title" 
+                               @oninput="HandleInput"
+                               placeholder="Ingresa el título de la película" />
+                        @if (showTitleError)
+                        {
+                            <small class="text-danger">El título es requerido</small>
+                        }
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Descripción</label>
+                        <textarea class="form-control" rows="4" 
+                                  @bind="currentMovie.Description"
+                                  placeholder="Ingresa una descripción de la película (opcional)"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" @onclick="CloseModal">Cancelar</button>
+                    <button type="button" class="btn btn-primary" @onclick="SaveMovie" 
+                            disabled="@(string.IsNullOrWhiteSpace(currentMovie.Title))">
+                        Guardar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    private List<Movie>? movies;
+    private Movie currentMovie = new();
+    private bool showModal = false;
+    private bool showTitleError = false;
+    private string searchTerm = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadMovies();
+    }
+
+    private async Task LoadMovies()
+    {
+        try
+        {
+            movies = await MovieService.GetMoviesAsync();
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error loading movies: {ex.Message}");
+        }
+    }
+
+    private async Task HandleSearch()
+    {
+        try
+        {
+            if (string.IsNullOrWhiteSpace(searchTerm))
+            {
+                await LoadMovies();
+            }
+            else
+            {
+                movies = await MovieService.SearchMoviesAsync(searchTerm);
+                StateHasChanged();
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error searching: {ex.Message}");
+        }
+    }
+
+    private async Task HandleClearSearch()
+    {
+        searchTerm = string.Empty;
+        await LoadMovies();
+    }
+
+    private void ShowCreateModal()
+    {
+        currentMovie = new Movie();
+        showModal = true;
+        showTitleError = false;
+        StateHasChanged();
+    }
+
+    private void ShowEditModal(Movie movie)
+    {
+        currentMovie = new Movie
+        {
+            Id = movie.Id,
+            Title = movie.Title,
+            Description = movie.Description
+        };
+        showModal = true;
+        showTitleError = false;
+        StateHasChanged();
+    }
+
+    private void CloseModal()
+    {
+        showModal = false;
+        showTitleError = false;
+        StateHasChanged();
+    }
+
+    private void HandleInput(ChangeEventArgs e)
+    {
+        StateHasChanged();
+    }
+
+    private async Task SaveMovie()
+    {
+        if (string.IsNullOrWhiteSpace(currentMovie.Title))
+        {
+            showTitleError = true;
+            StateHasChanged();
+            return;
+        }
+
+        try
+        {
+            if (currentMovie.Id == 0)
+            {
+                await MovieService.CreateMovieAsync(currentMovie);
+                await ShowAlert("Película creada exitosamente");
+            }
+            else
+            {
+                await MovieService.UpdateMovieAsync(currentMovie);
+                await ShowAlert("Película actualizada exitosamente");
+            }
+
+            showModal = false;
+            showTitleError = false;
+            await LoadMovies();
+        }
+        catch (Exception ex)
+        {
+            await ShowAlert($"Error al guardar: {ex.Message}");
+        }
+    }
+
+    private async Task DeleteMovie(int id)
+    {
+        var movie = movies?.FirstOrDefault(m => m.Id == id);
+        var movieTitle = movie?.Title ?? "esta película";
+        
+        var confirmed = await ShowConfirm($"¿Estás seguro de que quieres eliminar \"{movieTitle}\"?");
+        
+        if (confirmed)
+        {
+            try
+            {
+                var success = await MovieService.DeleteMovieAsync(id);
+                if (success)
+                {
+                    await LoadMovies();
+                    await ShowAlert("Película eliminada exitosamente");
+                }
+                else
+                {
+                    await ShowAlert("No se pudo encontrar la película para eliminar");
+                }
+            }
+            catch (Exception ex)
+            {
+                await ShowAlert($"Error al eliminar: {ex.Message}");
+            }
+        }
+    }
+
+    private async Task ShowAlert(string message)
+    {
+        await JS.InvokeVoidAsync("alert", message);
+    }
+
+    private async Task<bool> ShowConfirm(string message)
+    {
+        return await JS.InvokeAsync<bool>("confirm", message);
+    }
+}

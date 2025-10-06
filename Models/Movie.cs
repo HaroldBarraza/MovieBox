@@ -1,8 +1,9 @@
-namespace MovieBox.Models;
-
-public class Movie
+namespace MovieBox.Models
 {
-    public int Id { get; set; }
-    public string Title { get; set; } = string.Empty;
-    public string Description { get; set; } = string.Empty;
+    public class Movie
+    {
+        public int Id { get; set; }
+        public string Title { get; set; } = string.Empty;
+        public string Description { get; set; } = string.Empty;
+    }
 }
