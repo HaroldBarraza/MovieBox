@@ -1,6 +1,7 @@
 using MovieBox.Components;
 using MovieBox.Services;
 using MovieBox.Data;
+using MovieBox.Models; // 🔥 AGREGAR ESTA LÍNEA
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -47,14 +48,107 @@ else
 // Registrar servicios
 builder.Services.AddScoped<MovieService>();
 
+// Add HttpClient para OMDb
+builder.Services.AddHttpClient<OMDbService>();
+builder.Services.AddScoped<OMDbService>();
+
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
-if (!app.Environment.IsDevelopment())
+// 🔥 MINIMAL APIs
+app.MapGet("/api/movies", async (MovieService movieService) =>
 {
-    app.UseExceptionHandler("/Error", createScopeForErrors: true);
-    app.UseHsts();
-}
+    try
+    {
+        var movies = await movieService.GetMoviesAsync();
+        return Results.Ok(movies);
+    }
+    catch (Exception ex)
+    {
+        return Results.Problem($"Error: {ex.Message}");
+    }
+});
+
+app.MapGet("/api/movies/{id}", async (int id, MovieService movieService) =>
+{
+    try
+    {
+        var movie = await movieService.GetMovieAsync(id);
+        return movie is not null ? Results.Ok(movie) : Results.NotFound();
+    }
+    catch (Exception ex)
+    {
+        return Results.Problem($"Error: {ex.Message}");
+    }
+});
+
+app.MapPost("/api/movies", async (Movie movie, MovieService movieService) =>
+{
+    try
+    {
+        if (string.IsNullOrWhiteSpace(movie.Title))
+            return Results.BadRequest("Title is required");
+
+        var createdMovie = await movieService.CreateMovieAsync(movie);
+        return Results.Created($"/api/movies/{createdMovie.Id}", createdMovie);
+    }
+    catch (Exception ex)
+    {
+        return Results.Problem($"Error: {ex.Message}");
+    }
+});
+
+app.MapPut("/api/movies/{id}", async (int id, Movie movie, MovieService movieService) =>
+{
+    try
+    {
+        if (id != movie.Id)
+            return Results.BadRequest("ID mismatch");
+
+        var existing = await movieService.GetMovieAsync(id);
+        if (existing is null)
+            return Results.NotFound();
+
+        await movieService.UpdateMovieAsync(movie);
+        return Results.NoContent();
+    }
+    catch (Exception ex)
+    {
+        return Results.Problem($"Error: {ex.Message}");
+    }
+});
+
+app.MapDelete("/api/movies/{id}", async (int id, MovieService movieService) =>
+{
+    try
+    {
+        var existing = await movieService.GetMovieAsync(id);
+        if (existing is null)
+            return Results.NotFound();
+
+        var success = await movieService.DeleteMovieAsync(id);
+        return success ? Results.NoContent() : Results.Problem("Delete failed");
+    }
+    catch (Exception ex)
+    {
+        return Results.Problem($"Error: {ex.Message}");
+    }
+});
+
+app.MapGet("/api/movies/search/{term}", async (string term, MovieService movieService) =>
+{
+    try
+    {
+        if (string.IsNullOrWhiteSpace(term))
+            return Results.BadRequest("Search term is required");
+
+        var movies = await movieService.SearchMoviesAsync(term);
+        return Results.Ok(movies);
+    }
+    catch (Exception ex)
+    {
+        return Results.Problem($"Error: {ex.Message}");
+    }
+});
 
 app.UseStaticFiles();
 app.UseAntiforgery();

@@ -3,8 +3,10 @@
 @using MovieBox.Models
 @using MovieBox.Services
 @inject MovieService MovieService
+@inject OMDbService OMDbService
 @inject IJSRuntime JS
 
+<PageTitle>Películas</PageTitle>
 
 <div class="container mt-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
@@ -12,22 +14,6 @@
         <button class="btn btn-primary" @onclick="ShowCreateModal">
             <span class="oi oi-plus"></span> Nueva Película
         </button>
-    </div>
-
-    <!-- Barra de búsqueda -->
-    <div class="row mb-3">
-        <div class="col-md-6">
-            <div class="input-group">
-                <input type="text" class="form-control" placeholder="Buscar por título o descripción..." 
-                       @bind="searchTerm" @bind:event="oninput" />
-                <button class="btn btn-outline-secondary" @onclick="HandleSearch">
-                    <span class="oi oi-magnifying-glass"></span> Buscar
-                </button>
-                <button class="btn btn-outline-info" @onclick="HandleClearSearch">
-                    <span class="oi oi-x"></span> Limpiar
-                </button>
-            </div>
-        </div>
     </div>
 
     @if (movies == null)
@@ -41,9 +27,7 @@
     else if (!movies.Any())
     {
         <div class="alert alert-info">
-            @(string.IsNullOrEmpty(searchTerm) 
-                ? "No hay películas registradas. ¡Agrega la primera!" 
-                : "No se encontraron películas que coincidan con la búsqueda.")
+            No hay películas registradas. ¡Agrega la primera!
         </div>
     }
     else
@@ -54,7 +38,7 @@
                     <tr>
                         <th>ID</th>
                         <th>Título</th>
-                        <th>Descripción</th>
+                        <th>Género</th>
                         <th>Acciones</th>
                     </tr>
                 </thead>
@@ -65,17 +49,12 @@
                             <td>@movie.Id</td>
                             <td>
                                 <strong>@movie.Title</strong>
-                            </td>
-                            <td>
                                 @if (!string.IsNullOrEmpty(movie.Description))
                                 {
-                                    @movie.Description
-                                }
-                                else
-                                {
-                                    <span class="text-muted">Sin descripción</span>
+                                    <br /><small class="text-muted">@TruncateDescription(movie.Description)</small>
                                 }
                             </td>
+                            <td>@movie.Genre</td>
                             <td>
                                 <button class="btn btn-sm btn-warning" @onclick="() => ShowEditModal(movie)">
                                     <span class="oi oi-pencil"></span> Editar
@@ -96,36 +75,117 @@
 @if (showModal)
 {
     <div class="modal show d-block" style="background-color: rgba(0,0,0,0.5);" tabindex="-1">
-        <div class="modal-dialog">
+        <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title">@(currentMovie.Id == 0 ? "Agregar Película" : "Editar Película")</h5>
                     <button type="button" class="btn-close" @onclick="CloseModal"></button>
                 </div>
                 <div class="modal-body">
-                    <div class="mb-3">
-                        <label class="form-label">Título *</label>
-                        <input type="text" class="form-control" @bind="currentMovie.Title" 
-                               @oninput="HandleInput"
-                               placeholder="Ingresa el título de la película" />
-                        @if (showTitleError)
-                        {
-                            <small class="text-danger">El título es requerido</small>
-                        }
-                    </div>
-                    
-                    <div class="mb-3">
-                        <label class="form-label">Descripción</label>
-                        <textarea class="form-control" rows="4" 
-                                  @bind="currentMovie.Description"
-                                  placeholder="Ingresa una descripción de la película (opcional)"></textarea>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <!-- Búsqueda y sugerencias -->
+                            <div class="mb-3">
+                                <label class="form-label">Buscar Película *</label>
+                                <div class="position-relative">
+                                    <input type="text" 
+                                           class="form-control" 
+                                           value="@searchQuery"
+                                           @oninput="HandleSearchInput"
+                                           placeholder="Escribe el nombre de la película..."
+                                           disabled="@isLoadingSuggestions" />
+                                    
+                                    @if (isLoadingSuggestions)
+                                    {
+                                        <div class="position-absolute top-50 end-0 translate-middle-y me-2">
+                                            <div class="spinner-border spinner-border-sm" role="status">
+                                                <span class="visually-hidden">Buscando...</span>
+                                            </div>
+                                        </div>
+                                    }
+                                </div>
+
+                                <!-- Lista de sugerencias -->
+                                @if (suggestions.Any() && !string.IsNullOrWhiteSpace(searchQuery))
+                                {
+                                    <div class="suggestions-list mt-2 border rounded">
+                                        @foreach (var suggestion in suggestions)
+                                        {
+                                            <div class="suggestion-item p-2 border-bottom" 
+                                                 @onclick="() => SelectSuggestion(suggestion)"
+                                                 style="cursor: pointer;">
+                                                <div class="d-flex align-items-center">
+                                                    @if (!string.IsNullOrEmpty(suggestion.Poster) && suggestion.Poster != "N/A")
+                                                    {
+                                                        <img src="@suggestion.Poster" 
+                                                             alt="@suggestion.Title" 
+                                                             style="width: 40px; height: 60px; object-fit: cover;"
+                                                             class="me-2" />
+                                                    }
+                                                    <div>
+                                                        <strong>@suggestion.Title</strong>
+                                                        <br />
+                                                        <small class="text-muted">@suggestion.Year • @suggestion.Type</small>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        }
+                                    </div>
+                                }
+                            </div>
+
+                            <!-- Campos editables -->
+                            <div class="mb-3">
+                                <label class="form-label">Título *</label>
+                                <input type="text" class="form-control" @bind="currentMovie.Title" />
+                                @if (showTitleError)
+                                {
+                                    <small class="text-danger">El título es requerido</small>
+                                }
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Género</label>
+                                <input type="text" class="form-control" @bind="currentMovie.Genre" 
+                                       placeholder="Ej: Action, Drama, Comedy" />
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Descripción</label>
+                                <textarea class="form-control" rows="3" @bind="currentMovie.Description"
+                                          placeholder="Breve descripción..."></textarea>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Trama (Plot)</label>
+                                <textarea class="form-control" rows="4" @bind="currentMovie.Plot"
+                                          placeholder="Trama completa de la película..."></textarea>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">URL del Póster</label>
+                                <input type="url" class="form-control" @bind="currentMovie.Poster" 
+                                       placeholder="https://example.com/poster.jpg" />
+                                @if (!string.IsNullOrEmpty(currentMovie.Poster) && currentMovie.Poster != "N/A")
+                                {
+                                    <div class="mt-2">
+                                        <img src="@currentMovie.Poster" 
+                                             alt="Poster" 
+                                             style="max-width: 200px; max-height: 300px;"
+                                             class="img-thumbnail" />
+                                    </div>
+                                }
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" @onclick="CloseModal">Cancelar</button>
                     <button type="button" class="btn btn-primary" @onclick="SaveMovie" 
                             disabled="@(string.IsNullOrWhiteSpace(currentMovie.Title))">
-                        Guardar
+                        @(currentMovie.Id == 0 ? "Crear Película" : "Actualizar Película")
                     </button>
                 </div>
             </div>
@@ -133,12 +193,32 @@
     </div>
 }
 
+<style>
+    .suggestions-list {
+        background: white;
+        max-height: 300px;
+        overflow-y: auto;
+        z-index: 1000;
+    }
+
+    .suggestion-item:hover {
+        background-color: #f8f9fa;
+    }
+
+    .suggestion-item:last-child {
+        border-bottom: none !important;
+    }
+</style>
+
 @code {
     private List<Movie>? movies;
     private Movie currentMovie = new();
     private bool showModal = false;
     private bool showTitleError = false;
-    private string searchTerm = string.Empty;
+    private string searchQuery = string.Empty;
+    private List<MovieSuggestion> suggestions = new();
+    private bool isLoadingSuggestions = false;
+    private System.Threading.CancellationTokenSource? searchCancellationTokenSource;
 
     protected override async Task OnInitializedAsync()
     {
@@ -158,17 +238,38 @@
         }
     }
 
-    private async Task HandleSearch()
+    private async void HandleSearchInput(ChangeEventArgs e)
     {
+        searchQuery = e.Value?.ToString() ?? "";
+        
+        // Cancelar búsqueda anterior
+        searchCancellationTokenSource?.Cancel();
+        searchCancellationTokenSource = new System.Threading.CancellationTokenSource();
+        
+        await SearchMoviesDelayed(searchCancellationTokenSource.Token);
+    }
+
+    private async Task SearchMoviesDelayed(System.Threading.CancellationToken cancellationToken)
+    {
+        await Task.Delay(500); // Esperar 500ms después de que el usuario deje de escribir
+        
+        if (cancellationToken.IsCancellationRequested || string.IsNullOrWhiteSpace(searchQuery) || searchQuery.Length < 2)
+        {
+            suggestions.Clear();
+            StateHasChanged();
+            return;
+        }
+
         try
         {
-            if (string.IsNullOrWhiteSpace(searchTerm))
+            isLoadingSuggestions = true;
+            StateHasChanged();
+
+            var results = await OMDbService.SearchMoviesAsync(searchQuery);
+            
+            if (!cancellationToken.IsCancellationRequested)
             {
-                await LoadMovies();
-            }
-            else
-            {
-                movies = await MovieService.SearchMoviesAsync(searchTerm);
+                suggestions = results;
                 StateHasChanged();
             }
         }
@@ -176,17 +277,51 @@
         {
             Console.WriteLine($"Error searching: {ex.Message}");
         }
+        finally
+        {
+            isLoadingSuggestions = false;
+            StateHasChanged();
+        }
     }
 
-    private async Task HandleClearSearch()
+    private async Task SelectSuggestion(MovieSuggestion suggestion)
     {
-        searchTerm = string.Empty;
-        await LoadMovies();
+        try
+        {
+            // Obtener detalles completos de la película
+            var details = await OMDbService.GetMovieDetailsAsync(suggestion.imdbID);
+            
+            if (details != null)
+            {
+                // Autorellenar los campos
+                currentMovie.Title = details.Title;
+                currentMovie.Description = details.Plot.Length > 200 ? details.Plot.Substring(0, 200) + "..." : details.Plot;
+                currentMovie.Plot = details.Plot;
+                currentMovie.Genre = details.Genre?.Split(',').FirstOrDefault()?.Trim() ?? "";
+                currentMovie.Poster = details.Poster != "N/A" ? details.Poster : "";
+                
+                // Limpiar sugerencias
+                suggestions.Clear();
+                searchQuery = "";
+                StateHasChanged();
+            }
+        }
+        catch (Exception ex)
+        {
+            await JS.InvokeVoidAsync("alert", $"Error al cargar detalles: {ex.Message}");
+        }
+    }
+
+    private string TruncateDescription(string description, int length = 100)
+    {
+        return description.Length > length ? description.Substring(0, length) + "..." : description;
     }
 
     private void ShowCreateModal()
     {
         currentMovie = new Movie();
+        suggestions.Clear();
+        searchQuery = "";
         showModal = true;
         showTitleError = false;
         StateHasChanged();
@@ -198,8 +333,13 @@
         {
             Id = movie.Id,
             Title = movie.Title,
-            Description = movie.Description
+            Description = movie.Description,
+            Plot = movie.Plot,
+            Genre = movie.Genre,
+            Poster = movie.Poster
         };
+        suggestions.Clear();
+        searchQuery = "";
         showModal = true;
         showTitleError = false;
         StateHasChanged();
@@ -209,11 +349,8 @@
     {
         showModal = false;
         showTitleError = false;
-        StateHasChanged();
-    }
-
-    private void HandleInput(ChangeEventArgs e)
-    {
+        suggestions.Clear();
+        searchQuery = "";
         StateHasChanged();
     }
 

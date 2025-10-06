@@ -1,0 +1,65 @@
+@MovieBox_HostAddress = http://localhost:8080
+
+### 🎬 OBTENER TODAS LAS PELÍCULAS
+GET {{MovieBox_HostAddress}}/api/movies
+Accept: application/json
+
+###
+
+### 🔍 OBTENER PELÍCULA POR ID
+GET {{MovieBox_HostAddress}}/api/movies/1
+Accept: application/json
+
+###
+
+### ➕ CREAR NUEVA PELÍCULA
+POST {{MovieBox_HostAddress}}/api/movies
+Content-Type: application/json
+
+{
+    "title": "The Matrix",
+    "description": "A computer hacker learns about the true nature of reality",
+    "plot": "Neo discovers he's living in a simulated reality and joins a rebellion against the machines",
+    "poster": "https://example.com/matrix-poster.jpg",
+    "genre": "Sci-Fi"
+}
+
+###
+
+### ✏️ ACTUALIZAR PELÍCULA EXISTENTE
+PUT {{MovieBox_HostAddress}}/api/movies/1
+Content-Type: application/json
+
+{
+    "id": 1,
+    "title": "The Matrix Reloaded",
+    "description": "Neo continues his journey in the Matrix",
+    "plot": "Neo learns more about the Matrix and his role as The One",
+    "poster": "https://example.com/matrix-reloaded-poster.jpg",
+    "genre": "Sci-Fi Action"
+}
+
+###
+
+### 🗑️ ELIMINAR PELÍCULA
+DELETE {{MovieBox_HostAddress}}/api/movies/1
+
+###
+
+### 🔎 BUSCAR PELÍCULAS
+GET {{MovieBox_HostAddress}}/api/movies/search/matrix
+Accept: application/json
+
+###
+
+### 🧪 PRUEBA COMPLETA - Crear película para autocompletado
+POST {{MovieBox_HostAddress}}/api/movies
+Content-Type: application/json
+
+{
+    "title": "Avengers: Endgame",
+    "description": "The Avengers take a final stand against Thanos",
+    "plot": "After the devastating events of Infinity War, the Avengers assemble once more to reverse Thanos' actions and restore balance to the universe",
+    "poster": "https://example.com/endgame-poster.jpg",
+    "genre": "Action"
+}

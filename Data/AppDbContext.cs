@@ -15,12 +15,19 @@ namespace MovieBox.Data
         {
             base.OnModelCreating(modelBuilder);
             
-            // Configuración mínima para la tabla existente
             modelBuilder.Entity<Movie>(entity =>
             {
+                entity.ToTable("movies");
+                
                 entity.HasKey(e => e.Id);
-                entity.Property(e => e.Title).IsRequired();
-                entity.Property(e => e.Description);
+                
+                // 🔥 USAR PASCALCASE (Id, Title, Description, etc.)
+                entity.Property(e => e.Id).HasColumnName("id");
+                entity.Property(e => e.Title).HasColumnName("title").IsRequired();
+                entity.Property(e => e.Description).HasColumnName("description");
+                entity.Property(e => e.Plot).HasColumnName("plot");
+                entity.Property(e => e.Poster).HasColumnName("poster");
+                entity.Property(e => e.Genre).HasColumnName("genre");
             });
         }
     }
