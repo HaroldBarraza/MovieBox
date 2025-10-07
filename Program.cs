@@ -35,6 +35,7 @@ else
 
 // SIEMPRE registrar MovieService
 builder.Services.AddScoped<MovieService>();
+builder.Services.AddScoped<UserService>();
 
 var app = builder.Build();
 

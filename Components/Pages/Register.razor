@@ -1,0 +1,39 @@
+@page "/register"
+@using MovieBox.Models
+@using Microsoft.AspNetCore.Components.Forms
+@inject UserService UserService
+
+<EditForm Model="@registerModel"
+          OnValidSubmit="HandleValidSubmit"
+          OnInvalidSubmit="HandleInvalidSubmit">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <InputText @bind-Value="registerModel.Username" />
+    <ValidationMessage For="@(() => registerModel.Username)" />
+
+    <InputText @bind-Value="registerModel.Email" />
+    <ValidationMessage For="@(() => registerModel.Email)" />
+
+    <InputText @bind-Value="registerModel.Password" type="password" />
+    <ValidationMessage For="@(() => registerModel.Password)" />
+
+    <InputText @bind-Value="registerModel.ConfirmPassword" type="password" />
+    <ValidationMessage For="@(() => registerModel.ConfirmPassword)" />
+
+    <button type="submit">Register</button>
+</EditForm>
+
+@code {
+    private RegisterModel registerModel = new RegisterModel();
+
+    async Task HandleValidSubmit(EditContext context)
+    {
+        // Do nothing
+    }
+
+    void HandleInvalidSubmit(EditContext context)
+    {
+        // Do nothing
+    }
+}
