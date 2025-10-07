@@ -1,7 +1,6 @@
 @page "/register"
 @using MovieBox.Models
 @using Microsoft.AspNetCore.Components.Forms
-@inject UserService UserService
 
 <EditForm Model="@registerModel"
           OnValidSubmit="HandleValidSubmit"
@@ -9,30 +8,42 @@
     <DataAnnotationsValidator />
     <ValidationSummary />
 
-    <InputText @bind-Value="registerModel.Username" />
-    <ValidationMessage For="@(() => registerModel.Username)" />
+    <div class="form-group mb-3">
+        <label for="username">Username</label>
+        <InputText id="username" @bind-Value="registerModel.Username" class="form-control" />
+        <ValidationMessage For="@(() => registerModel.Username)" class="text-danger" />
+    </div>
 
-    <InputText @bind-Value="registerModel.Email" />
-    <ValidationMessage For="@(() => registerModel.Email)" />
+    <div class="form-group mb-3">
+        <label for="email">Email</label>
+        <InputText id="email" @bind-Value="registerModel.Email" class="form-control" />
+        <ValidationMessage For="@(() => registerModel.Email)" class="text-danger" />
+    </div>
 
-    <InputText @bind-Value="registerModel.Password" type="password" />
-    <ValidationMessage For="@(() => registerModel.Password)" />
+    <div class="form-group mb-3">
+        <label for="password">Password</label>
+        <InputText id="password" @bind-Value="registerModel.Password" type="password" class="form-control" />
+        <ValidationMessage For="@(() => registerModel.Password)" class="text-danger" />
+    </div>
 
-    <InputText @bind-Value="registerModel.ConfirmPassword" type="password" />
-    <ValidationMessage For="@(() => registerModel.ConfirmPassword)" />
+    <div class="form-group mb-3">
+        <label for="confirmPassword">Confirm Password</label>
+        <InputText id="confirmPassword" @bind-Value="registerModel.ConfirmPassword" type="password" class="form-control" />
+        <ValidationMessage For="@(() => registerModel.ConfirmPassword)" class="text-danger" />
+    </div>
 
-    <button type="submit">Register</button>
+    <button type="submit" class="btn btn-primary">Register</button>
 </EditForm>
 
 @code {
     private RegisterModel registerModel = new RegisterModel();
 
-    async Task HandleValidSubmit(EditContext context)
+    private void HandleValidSubmit()
     {
         // Do nothing
     }
 
-    void HandleInvalidSubmit(EditContext context)
+    private void HandleInvalidSubmit()
     {
         // Do nothing
     }

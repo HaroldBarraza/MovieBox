@@ -3147,19 +3147,19 @@
     ]
   },
   "packageFolders": {
-    "/home/nasandratra/.nuget/packages/": {}
+    "C:\\Users\\HAROLD\\.nuget\\packages\\": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "/home/nasandratra/Desktop/MovieBox/MovieBox.csproj",
+      "projectUniqueName": "E:\\BYU\\code\\Next.js\\MovieBox\\MovieBox.csproj",
       "projectName": "MovieBox",
-      "projectPath": "/home/nasandratra/Desktop/MovieBox/MovieBox.csproj",
-      "packagesPath": "/home/nasandratra/.nuget/packages/",
-      "outputPath": "/home/nasandratra/Desktop/MovieBox/obj/",
+      "projectPath": "E:\\BYU\\code\\Next.js\\MovieBox\\MovieBox.csproj",
+      "packagesPath": "C:\\Users\\HAROLD\\.nuget\\packages\\",
+      "outputPath": "E:\\BYU\\code\\Next.js\\MovieBox\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
-        "/home/nasandratra/.nuget/NuGet/NuGet.Config"
+        "C:\\Users\\HAROLD\\AppData\\Roaming\\NuGet\\NuGet.Config"
       ],
       "originalTargetFrameworks": [
         "net9.0"
@@ -3227,7 +3227,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "/home/nasandratra/Downloads/dotnet-sdk-9.0.305-linux-x64/sdk/9.0.305/PortableRuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.304/PortableRuntimeIdentifierGraph.json"
       }
     }
   }
