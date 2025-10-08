@@ -1,15 +1,15 @@
 {
   "format": 1,
   "restore": {
-    "/home/nasandratra/Desktop/MovieBox/MovieBox.csproj": {}
+    "/home/nasandratra/Desktop/MovieBox/MOVIEBOX.csproj": {}
   },
   "projects": {
-    "/home/nasandratra/Desktop/MovieBox/MovieBox.csproj": {
+    "/home/nasandratra/Desktop/MovieBox/MOVIEBOX.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/home/nasandratra/Desktop/MovieBox/MovieBox.csproj",
-        "projectName": "MovieBox",
-        "projectPath": "/home/nasandratra/Desktop/MovieBox/MovieBox.csproj",
+        "projectUniqueName": "/home/nasandratra/Desktop/MovieBox/MOVIEBOX.csproj",
+        "projectName": "MOVIEBOX",
+        "projectPath": "/home/nasandratra/Desktop/MovieBox/MOVIEBOX.csproj",
         "packagesPath": "/home/nasandratra/.nuget/packages/",
         "outputPath": "/home/nasandratra/Desktop/MovieBox/obj/",
         "projectStyle": "PackageReference",
