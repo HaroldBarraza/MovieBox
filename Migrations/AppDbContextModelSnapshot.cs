@@ -39,7 +39,7 @@ namespace MovieBox.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Movies");
+                    b.ToTable("movies");
                 });
 
             modelBuilder.Entity("MovieBox.Models.User", b =>
@@ -52,19 +52,26 @@ namespace MovieBox.Migrations
 
                     b.Property<string>("Email")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("text")
+                        .HasColumnName("email");
 
                     b.Property<string>("PasswordHash")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("text")
+                        .HasColumnName("passwordhash");
+
+                    b.Property<string>("Role")
+                        .HasColumnType("text")
+                        .HasColumnName("role");
 
                     b.Property<string>("Username")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("text")
+                        .HasColumnName("username");
 
                     b.HasKey("Id");
 
-                    b.ToTable("Users");
+                    b.ToTable("users");
                 });
 #pragma warning restore 612, 618
         }

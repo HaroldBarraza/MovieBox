@@ -1,5 +1,8 @@
+using System.ComponentModel.DataAnnotations.Schema;
+
 namespace MovieBox.Models;
 
+[Table("movies")]
 public class Movie
 {
     public int Id { get; set; }

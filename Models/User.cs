@@ -1,18 +1,29 @@
 namespace MovieBox.Models;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
+[Table("users")]
 public class User
 {
     [Key]
-    public int Id { get; set; }
+    [Column("id")]
+    public int? Id { get; set; }
     [Required]
+    [Column("username")]
+
     public string Username { get; set; } = string.Empty;
+
+
+    [Column("role")]
+    public string? Role { get; set; } = "user";
 
     [Required]
     [EmailAddress]
+    [Column("email")]
     public string Email { get; set; } = string.Empty;
 
     [Required]
     [MinLength(6)]
+    [Column("passwordhash")]
     public string PasswordHash { get; set; } = string.Empty;
 }

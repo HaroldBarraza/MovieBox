@@ -1,0 +1,96 @@
+@page "/signin"
+
+@rendermode InteractiveServer
+@using MovieBox.Authentication
+@using MovieBox.Models
+@using System.ComponentModel.DataAnnotations
+@using Microsoft.AspNetCore.Components.Forms
+@using MovieBox.Services
+@using Microsoft.AspNetCore.Components.Authorization
+@inject UserService UserService
+@inject NavigationManager navManager
+@inject AuthenticationStateProvider authStateProvider
+
+<EditForm 
+    Model="@signinModel" 
+    OnValidSubmit="HandleValidSubmit" 
+    FormName="SigninForm"
+>
+    <DataAnnotationsValidator />
+    @if (!string.IsNullOrEmpty(signinError))
+    {
+        <div class="text-danger">@signinError</div>
+    }
+    <div class="mb-3">
+        <label for="email" class="form-label">Email</label>
+        <InputText 
+            id="email" 
+            placeholder="Enter your email" 
+            class="form-control"
+            Name="Email"
+            @bind-Value="signinModel.Email" />
+        <ValidationMessage For="() => signinModel.Email" />
+    </div>
+
+    <div class="mb-3">
+        <label for="password" class="form-label">Password</label>
+        <InputText 
+            id="password" 
+            type="password"
+            placeholder="Enter your password" 
+            class="form-control"
+            Name="Password"
+            @bind-Value="signinModel.Password" />
+        <ValidationMessage For="() => signinModel.Password" />
+    </div>
+
+    <button type="submit" class="btn btn-primary" disabled="@isLoading">
+        @if (isLoading)
+        {
+            <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+            <span>Signing in...</span>
+        }
+        else
+        {
+            <span>Sign In</span>
+        }
+    </button>
+</EditForm>
+
+@code {
+    private SigninModel signinModel = new SigninModel();
+    private string signinError = "";
+    private bool isLoading = false;
+
+    async Task HandleValidSubmit(EditContext context)
+    {
+        signinError = "";
+        isLoading = true;
+        StateHasChanged();
+        try
+        {
+            var user = await UserService.SignInAsync(signinModel);
+            signinModel = new SigninModel();
+            var customAuthStateProvider = (CustomAuthenticationStateProvider)authStateProvider;
+            await customAuthStateProvider.UpdateAuthenticationState(new UserSession 
+                { 
+                    Id = user.Id,
+                    Username = user.Username,
+                    Email = user.Email, 
+                    Role = user.Role
+                });
+
+                await Task.Delay(100); // Give time for state to propagate
+Console.WriteLine("Navigating to home...");
+Console.WriteLine($"User: {user.Username}, Email: {user.Email}, Role: {user.Role}");
+            isLoading = false;
+            navManager.NavigateTo("/", true);
+        }
+        catch (Exception ex)
+        {
+            signinError = ex.Message;
+            isLoading = false;
+            StateHasChanged();
+        }
+    }
+}

@@ -16,10 +16,11 @@ public class UserService
 
     public async Task<User> RegisterAsync(RegisterModel model)
     {
-        if (await _context.Users.AnyAsync(u => u.Email == model.Email))
-            throw new Exception("Email already exists.");
+        Console.WriteLine("Registering user:");
         Console.WriteLine(model.Username);
         Console.WriteLine(model.Email);
+        if (await _context.Users.AnyAsync(u => u.Email == model.Email))
+            throw new Exception("Email already exists.");
         var user = new User
         {
             Username = model.Username,
@@ -32,14 +33,18 @@ public class UserService
         return user;
     }
 
-    // public async Task<User> SignInAsync(string username, string password)
-    // {
-    //     var user = await _context.Users.FirstOrDefaultAsync(u => u.Username == username);
-    //     if (user == null || !VerifyPassword(password, user.PasswordHash))
-    //         throw new Exception("Invalid username or password.");
-
-    //     return user;
-    // }
+    public async Task<User> SignInAsync(SigninModel model)
+    {
+        var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == model.Email);
+        if (user == null || !VerifyPassword(model.Password, user.PasswordHash))
+            throw new Exception("Invalid email or password.");
+        Console.WriteLine("User signed in:");
+        Console.WriteLine(user.Username);
+        Console.WriteLine(user.Email);
+        Console.WriteLine(user.Id);
+        Console.WriteLine(user.Role);
+        return user;
+    }
 
     private string HashPassword(string password)
     {

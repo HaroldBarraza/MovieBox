@@ -1,39 +1,111 @@
 @page "/register"
+@rendermode InteractiveServer
 @using MovieBox.Models
+@using System.ComponentModel.DataAnnotations
 @using Microsoft.AspNetCore.Components.Forms
+@using MovieBox.Services
 @inject UserService UserService
+@inject NavigationManager navManager
 
-<EditForm Model="@registerModel"
-          OnValidSubmit="HandleValidSubmit"
-          OnInvalidSubmit="HandleInvalidSubmit">
-    <DataAnnotationsValidator />
-    <ValidationSummary />
+<h1>Create your account</h1>
 
-    <InputText @bind-Value="registerModel.Username" />
-    <ValidationMessage For="@(() => registerModel.Username)" />
+<EditForm 
+	Model="@registerModel" 
+	OnValidSubmit="HandleValidSubmit" 
+	FormName="RegisterForm"
+>
+	<DataAnnotationsValidator />
+	<div class="mb-3">
+		<label for="username" class="form-label">Username</label>
+		<InputText 
+			id="username" placeholder="Enter your username" 
+			class="form-control"
+			@bind-Value="registerModel.Username" 
+			Name="Username"
+		/>
+		<ValidationMessage For="() => registerModel.Username" />
+	</div>
 
-    <InputText @bind-Value="registerModel.Email" />
-    <ValidationMessage For="@(() => registerModel.Email)" />
+	<div class="mb-3">
+		<label for="email" class="form-label">Email</label>
+		<InputText 
+			id="email" 
+			placeholder="Enter your email" 
+			class="form-control"
+			Name="Email"
+			@bind-Value="registerModel.Email" />
+		<ValidationMessage For="() => registerModel.Email" />
+		@if (!string.IsNullOrEmpty(emailError))
+		{
+			<div class="text-danger">@emailError</div>
+		}
+	</div>
 
-    <InputText @bind-Value="registerModel.Password" type="password" />
-    <ValidationMessage For="@(() => registerModel.Password)" />
+	<div class="mb-3">
+		<label for="password" class="form-label">Password</label>
+		<InputText 
+			id="password" 
+			type="password"
+			placeholder="Enter your password" 
+			class="form-control"
+			Name="Password"
+			@bind-Value="registerModel.Password" />
+		<ValidationMessage For="() => registerModel.Password" />
+	</div>
 
-    <InputText @bind-Value="registerModel.ConfirmPassword" type="password" />
-    <ValidationMessage For="@(() => registerModel.ConfirmPassword)" />
+	<div class="mb-3">
+		<label for="confirmPassword" class="form-label">Confirm Password</label>
+		<InputText 
+			id="confirmPassword" 
+			type="password"
+			placeholder="Confirm your password" 
+			class="form-control"
+			Name="ConfirmPassword"
+			@bind-Value="registerModel.ConfirmPassword" />
+		<ValidationMessage For="() => registerModel.ConfirmPassword" />
+	</div>
 
-    <button type="submit">Register</button>
+	<button type="submit" class="btn btn-primary" disabled="@isLoading">
+		@if (isLoading)
+		{
+			<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+			<span>Registering...</span>
+		}
+		else
+		{
+			<span>Register</span>
+		}
+	</button>
 </EditForm>
 
 @code {
     private RegisterModel registerModel = new RegisterModel();
+    private string emailError = "";
+    private bool isLoading = false;
 
     async Task HandleValidSubmit(EditContext context)
     {
-        // Do nothing
-    }
-
-    void HandleInvalidSubmit(EditContext context)
-    {
-        // Do nothing
+        emailError = "";
+        isLoading = true;
+        StateHasChanged();
+        try {
+            await UserService.RegisterAsync(registerModel);
+            registerModel = new RegisterModel();
+            isLoading = false;
+			navManager.NavigateTo("/signin");
+            StateHasChanged();
+        } catch (Exception ex) {
+            if (ex.Message.Contains("Email already exists"))
+            {
+                emailError = "This email is already registered.";
+            }
+            else
+            {
+                Console.WriteLine($"Error during registration: {ex.Message}");
+            }
+            isLoading = false;
+            StateHasChanged();
+            return;
+        }
     }
 }

@@ -6,13 +6,13 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace MovieBox.Migrations
 {
     /// <inheritdoc />
-    public partial class UpdateUserTable : Migration
+    public partial class InitialCreate : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "Movies",
+                name: "movies",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
@@ -22,22 +22,23 @@ namespace MovieBox.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Movies", x => x.Id);
+                    table.PrimaryKey("PK_movies", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
-                name: "Users",
+                name: "users",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    Username = table.Column<string>(type: "text", nullable: false),
-                    Email = table.Column<string>(type: "text", nullable: false),
-                    PasswordHash = table.Column<string>(type: "text", nullable: false)
+                    username = table.Column<string>(type: "text", nullable: false),
+                    role = table.Column<string>(type: "text", nullable: true),
+                    email = table.Column<string>(type: "text", nullable: false),
+                    passwordhash = table.Column<string>(type: "text", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Users", x => x.Id);
+                    table.PrimaryKey("PK_users", x => x.Id);
                 });
         }
 
@@ -45,10 +46,10 @@ namespace MovieBox.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "Movies");
+                name: "movies");
 
             migrationBuilder.DropTable(
-                name: "Users");
+                name: "users");
         }
     }
 }

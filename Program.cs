@@ -2,12 +2,18 @@ using MovieBox.Components;
 using MovieBox.Services;
 using MovieBox.Data;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
+using Microsoft.AspNetCore.Components.Authorization;
+using MovieBox.Authentication;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+builder.Services.AddAuthenticationCore();
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
+builder.Services.AddScoped<ProtectedSessionStorage>();
+builder.Services.AddScoped<AuthenticationStateProvider, CustomAuthenticationStateProvider>();
 
 // Add HttpClient para TasteDive
 builder.Services.AddHttpClient<TasteDiveService>();

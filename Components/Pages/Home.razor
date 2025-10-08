@@ -1,7 +1,28 @@
 ﻿@page "/"
 @page "/home"
 @page "/home/"
+@rendermode InteractiveServerPrerendered(false)
+@using Microsoft.AspNetCore.Components.Authorization
+
+<AuthorizeView>
+    <Authorized>
+        <h1>Hello, @context.User.Identity.Name!</h1>
+        <p>IsAuthenticated: @context.User.Identity.IsAuthenticated.ToString()</p>
+        <p>Claims:</p>
+        <ul>
+            @foreach (var claim in context.User.Claims)
+            {
+                <li>@claim.Type: @claim.Value</li>
+            }
+        </ul>
+    </Authorized>
+    <NotAuthorized>
+        <h3>Hello, Guest!</h3>
+    </NotAuthorized>
+</AuthorizeView>
 
 
 <h1>Hello, world!</h1>
 Welcome to your new app.
+
+
