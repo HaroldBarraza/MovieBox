@@ -47,10 +47,12 @@ else
 
 // Registrar servicios
 builder.Services.AddScoped<MovieService>();
+builder.Services.AddScoped<CommentService>();
 
 // Add HttpClient para OMDb
 builder.Services.AddHttpClient<OMDbService>();
 builder.Services.AddScoped<OMDbService>();
+
 
 var app = builder.Build();
 

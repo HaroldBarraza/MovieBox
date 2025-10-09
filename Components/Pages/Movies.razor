@@ -3,6 +3,7 @@
 @using MovieBox.Models
 @using MovieBox.Services
 @inject MovieService MovieService
+@inject CommentService CommentService
 @inject NavigationManager Navigation
 @inject IJSRuntime JS
 
@@ -82,8 +83,25 @@ else
                         <div class="meta-item">
                             <strong>Calificación:</strong>
                             <div class="rating-container">
-                                <span class="rating-stars-details">★★★★★</span>
-                                <span class="rating-value-details">9.3 (3.1 M)</span>
+                                <!-- 🔥 SISTEMA DE NÚMEROS MEJORADO -->
+                                <div class="rating-numbers-display">
+                                    <span class="rating-badge">
+                                        @averageRating.ToString("0.0")
+                                    </span>
+                                    <span class="rating-max">/ 5.0</span>
+                                    <span class="rating-count">(@comments.Count comentarios)</span>
+                                </div>
+                                
+                                <!-- Información de distribución -->
+                                @if (comments.Any())
+                                {
+                                    <div class="rating-distribution mt-2">
+                                        <small class="text-muted">
+                                            <strong>Distribución:</strong> 
+                                            @GetRatingDistribution()
+                                        </small>
+                                    </div>
+                                }
                             </div>
                         </div>
                     </div>
@@ -114,6 +132,136 @@ else
                         <button class="btn btn-outline-danger" @onclick="DeleteMovie">
                             <span class="oi oi-trash"></span> Eliminar Película
                         </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECCIÓN DE COMENTARIOS -->
+        <div class="row mt-5">
+            <div class="col-12">
+                <div class="comments-section">
+                    <h3 class="mb-4">Comentarios y Calificaciones</h3>
+                    
+                    <!-- Formulario para agregar comentario -->
+                    <div class="card mb-4">
+                        <div class="card-body">
+                            <h5 class="card-title">Agregar Comentario</h5>
+                            <EditForm Model="@newComment" OnValidSubmit="AddComment">
+                                <DataAnnotationsValidator />
+                                
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label for="userName" class="form-label">Tu Nombre</label>
+                                        <InputText id="userName" @bind-Value="newComment.UserName" class="form-control" />
+                                        <ValidationMessage For="@(() => newComment.UserName)" class="text-danger" />
+                                    </div>
+                                    
+                                    <div class="col-md-6 mb-3">
+                                        <label for="ratingInput" class="form-label">Calificación (1-5)</label>
+                                        <div class="rating-input-container">
+                                            <!-- 🔥 INPUT NUMBER PARA ESCRIBIR DIRECTAMENTE -->
+                                            <InputNumber id="ratingInput" 
+                                                        @bind-Value="newComment.Rating" 
+                                                        class="form-control rating-input-number"
+                                                        min="1" 
+                                                        max="5" 
+                                                        step="1" />
+                                            <div class="rating-input-help">
+                                                <small class="text-muted">Escribe un número del 1 al 5</small>
+                                            </div>
+                                        </div>
+                                        <ValidationMessage For="@(() => newComment.Rating)" class="text-danger" />
+                                        
+                                        <!-- Indicador visual -->
+                                        <div class="rating-preview mt-2">
+                                            <small class="text-muted">
+                                                Calificación seleccionada: 
+                                                <span class="badge bg-warning text-dark">@newComment.Rating / 5</span>
+                                            </small>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="commentText" class="form-label">Comentario</label>
+                                    <InputTextArea id="commentText" @bind-Value="newComment.Text" 
+                                                 class="form-control" rows="4" 
+                                                 placeholder="Escribe tu comentario aquí..." />
+                                    <ValidationMessage For="@(() => newComment.Text)" class="text-danger" />
+                                </div>
+                                
+                                <button type="submit" class="btn btn-primary" disabled="@isSubmitting">
+                                    @if (isSubmitting)
+                                    {
+                                        <span class="spinner-border spinner-border-sm" role="status"></span>
+                                        <span> Enviando...</span>
+                                    }
+                                    else
+                                    {
+                                        <span>Publicar Comentario</span>
+                                    }
+                                </button>
+                            </EditForm>
+                        </div>
+                    </div>
+
+                    <!-- Lista de comentarios -->
+                    <div class="comments-list">
+                        @if (!comments.Any())
+                        {
+                            <div class="text-center py-4">
+                                <p class="text-muted">No hay comentarios aún. ¡Sé el primero en comentar!</p>
+                            </div>
+                        }
+                        else
+                        {
+                            foreach (var comment in comments)
+                            {
+                                <div class="card comment-card mb-3">
+                                    <div class="card-body">
+                                        <div class="d-flex justify-content-between align-items-start mb-2">
+                                            <div>
+                                                <h6 class="card-subtitle mb-1 text-primary">@comment.UserName</h6>
+                                                <small class="text-muted">@comment.CreatedAt.ToString("dd/MM/yyyy HH:mm")</small>
+                                            </div>
+                                            <div class="comment-rating">
+                                                <span class="badge bg-warning text-dark">
+                                                    @comment.Rating / 5
+                                                </span>
+                                            </div>
+                                        </div>
+                                        
+                                        <p class="card-text">@comment.Text</p>
+                                        
+                                        <!-- Sistema de votación para comentarios -->
+                                        <div class="comment-helpful mt-3">
+                                            <small class="text-muted me-3">
+                                                ¿Te pareció útil este comentario?
+                                            </small>
+                                            <button class="btn btn-sm btn-outline-success me-1" 
+                                                    @onclick="() => VoteComment(comment.Id, true)"
+                                                    title="Útil">
+                                                <span class="oi oi-thumb-up"></span> 
+                                                <span>@comment.HelpfulVotes</span>
+                                            </button>
+                                            <button class="btn btn-sm btn-outline-danger" 
+                                                    @onclick="() => VoteComment(comment.Id, false)"
+                                                    title="No útil">
+                                                <span class="oi oi-thumb-down"></span>
+                                                <span>@(comment.TotalVotes - comment.HelpfulVotes)</span>
+                                            </button>
+                                            @if (comment.TotalVotes > 0)
+                                            {
+                                                <small class="text-muted ms-2">
+                                                    (@comment.HelpfulScore.ToString("0")% útil)
+                                                </small>
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        }
                     </div>
                 </div>
             </div>
@@ -199,19 +347,70 @@ else
 
     .rating-container {
         display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+
+    .rating-numbers-display {
+        display: flex;
         align-items: center;
         gap: 0.5rem;
     }
 
-    .rating-stars-details {
-        color: #FFD700;
-        font-size: 1.2rem;
+    .rating-badge {
+        background: linear-gradient(135deg, #FFD700, #FFA500);
+        color: #000;
+        padding: 0.5rem 1rem;
+        border-radius: 8px;
+        font-size: 1.5rem;
+        font-weight: bold;
+        box-shadow: 0 2px 8px rgba(255, 215, 0, 0.3);
     }
 
-    .rating-value-details {
+    .rating-max {
         font-size: 1rem;
-        font-weight: 600;
-        color: #495057;
+        color: #6c757d;
+        font-weight: 500;
+    }
+
+    .rating-count {
+        font-size: 0.9rem;
+        color: #6c757d;
+    }
+
+    .rating-distribution {
+        padding: 0.5rem;
+        background-color: #f8f9fa;
+        border-radius: 4px;
+        border-left: 3px solid #6c757d;
+    }
+
+    /* Estilos para el input de calificación */
+    .rating-input-container {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .rating-input-number {
+        max-width: 120px;
+        font-size: 1.1rem;
+        font-weight: bold;
+        text-align: center;
+        padding: 0.5rem;
+    }
+
+    .rating-input-help {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .rating-preview {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
     }
 
     /* Estilos para las secciones de texto */
@@ -243,6 +442,28 @@ else
         flex-wrap: wrap;
     }
 
+
+    .comments-section {
+        margin-top: 3rem;
+        padding-top: 2rem;
+        border-top: 1px solid #e9ecef;
+    }
+
+    .comment-card {
+        border: 1px solid #e9ecef;
+        transition: box-shadow 0.2s;
+    }
+
+    .comment-card:hover {
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    .comment-helpful {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+    }
+
     /* Responsive */
     @@media (max-width: 768px) {
         .movie-title-details {
@@ -270,6 +491,16 @@ else
             width: 100%;
             margin: 0.25rem 0;
         }
+        
+        .comment-helpful {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 0.5rem;
+        }
+
+        .rating-numbers-display {
+            flex-wrap: wrap;
+        }
     }
 
     @@media (max-width: 576px) {
@@ -285,6 +516,15 @@ else
         .movie-plot {
             font-size: 1rem;
         }
+
+        .rating-badge {
+            font-size: 1.25rem;
+            padding: 0.4rem 0.8rem;
+        }
+
+        .rating-input-number {
+            max-width: 100px;
+        }
     }
 </style>
 
@@ -293,15 +533,23 @@ else
     public int Id { get; set; }
 
     private Movie? movie;
+    private List<Comment> comments = new();
+    private Comment newComment = new();
+    private bool isSubmitting = false;
+    private double averageRating = 0;
 
     protected override async Task OnInitializedAsync()
     {
         await LoadMovie();
+        await LoadComments();
+        await LoadAverageRating();
     }
 
     protected override async Task OnParametersSetAsync()
     {
         await LoadMovie();
+        await LoadComments();
+        await LoadAverageRating();
     }
 
     private async Task LoadMovie()
@@ -319,10 +567,84 @@ else
         }
     }
 
+    private async Task LoadComments()
+    {
+        if (Id > 0)
+        {
+            comments = await CommentService.GetCommentsByMovieAsync(Id);
+        }
+    }
+
+    private async Task LoadAverageRating()
+    {
+        if (Id > 0)
+        {
+            averageRating = await CommentService.GetMovieAverageRatingAsync(Id);
+        }
+    }
+
+    private async Task AddComment()
+    {
+        isSubmitting = true;
+        try
+        {
+            if (newComment.Rating < 1 || newComment.Rating > 5)
+            {
+                await JS.InvokeVoidAsync("alert", "La calificación debe ser entre 1 y 5");
+                return;
+            }
+
+            newComment.MovieId = Id;
+            await CommentService.CreateCommentAsync(newComment);
+            
+            newComment = new Comment();
+            
+            await LoadComments();
+            await LoadAverageRating();
+            
+            await JS.InvokeVoidAsync("alert", "Comentario agregado exitosamente");
+        }
+        catch (Exception ex)
+        {
+            await JS.InvokeVoidAsync("alert", $"Error al agregar comentario: {ex.Message}");
+        }
+        finally
+        {
+            isSubmitting = false;
+            StateHasChanged();
+        }
+    }
+
+    private async Task VoteComment(int commentId, bool isHelpful)
+    {
+        try
+        {
+            var success = await CommentService.VoteCommentAsync(commentId, isHelpful);
+            if (success)
+            {
+                await LoadComments(); 
+            }
+        }
+        catch (Exception ex)
+        {
+            await JS.InvokeVoidAsync("alert", $"Error al votar: {ex.Message}");
+        }
+    }
+    private string GetRatingDistribution()
+    {
+        if (!comments.Any()) return "Sin datos";
+
+        var distribution = new Dictionary<int, int>();
+        for (int i = 1; i <= 5; i++)
+        {
+            distribution[i] = comments.Count(c => c.Rating == i);
+        }
+
+        return string.Join(" | ", distribution.Select(d => $"{d.Key}★: {d.Value}"));
+    }
+
     private string GetMovieDuration()
     {
-        // Por ahora retornamos un valor estático
-        // Más adelante puedes agregar un campo Duration a tu modelo Movie
         return "2h 22m";
     }
 
