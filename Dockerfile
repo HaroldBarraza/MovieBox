@@ -1,9 +1,9 @@
 FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 WORKDIR /app
 COPY *.csproj .
-RUN dotnet restore MovieBox.csproj
+RUN dotnet restore MOVIEBOX.csproj
 COPY . .
-RUN dotnet publish MovieBox.csproj -c Release -o out
+RUN dotnet publish MOVIEBOX.csproj -c Release -o out
 
 FROM mcr.microsoft.com/dotnet/aspnet:9.0
 WORKDIR /app
