@@ -1,13 +1,12 @@
 @page "/signin"
-
-@rendermode InteractiveServer
-@using MovieBox.Authentication
-@using MovieBox.Models
 @using System.ComponentModel.DataAnnotations
 @using Microsoft.AspNetCore.Components.Forms
+@using MovieBox.Authentication
+@using MovieBox.Models
 @using MovieBox.Services
-@using Microsoft.AspNetCore.Components.Authorization
 @inject UserService UserService
+@inject IJSRuntime js
+
 @inject NavigationManager navManager
 @inject AuthenticationStateProvider authStateProvider
 
@@ -69,28 +68,27 @@
         StateHasChanged();
         try
         {
-            var user = await UserService.SignInAsync(signinModel);
-            signinModel = new SigninModel();
-            var customAuthStateProvider = (CustomAuthenticationStateProvider)authStateProvider;
-            await customAuthStateProvider.UpdateAuthenticationState(new UserSession 
-                { 
-                    Id = user.Id,
-                    Username = user.Username,
-                    Email = user.Email, 
-                    Role = user.Role
+            var userAccount = await UserService.SignInAsync(signinModel);
+            if (userAccount != null)
+            {
+                CustomAuthenticationStateProvider? customAuthStateProvider = (CustomAuthenticationStateProvider)authStateProvider;
+                await customAuthStateProvider.UpdateAuthenticationState(new UserSession
+                {
+                    UserId = userAccount.Id,
+                    UserName = userAccount.Username,
+                    Email = userAccount.Email,
+                    Role = userAccount.Role
                 });
-
-                await Task.Delay(100); // Give time for state to propagate
-Console.WriteLine("Navigating to home...");
-Console.WriteLine($"User: {user.Username}, Email: {user.Email}, Role: {user.Role}");
-            isLoading = false;
-            navManager.NavigateTo("/", true);
+                navManager.NavigateTo("/", true);
+            }
+          
         }
         catch (Exception ex)
         {
+            Console.WriteLine(ex);
             signinError = ex.Message;
-            isLoading = false;
-            StateHasChanged();
         }
+        isLoading = false;
+        StateHasChanged();
     }
 }

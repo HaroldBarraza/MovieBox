@@ -1,23 +1,26 @@
-using MovieBox.Components;
 using MovieBox.Services;
 using MovieBox.Data;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
-using Microsoft.AspNetCore.Components.Authorization;
 using MovieBox.Authentication;
+using Microsoft.AspNetCore.Components.Authorization;
+using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Components.Authorization;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddAuthenticationCore();
-builder.Services.AddRazorComponents()
-    .AddInteractiveServerComponents();
+builder.Services.AddRazorPages();
+builder.Services.AddServerSideBlazor();
 builder.Services.AddScoped<ProtectedSessionStorage>();
 builder.Services.AddScoped<AuthenticationStateProvider, CustomAuthenticationStateProvider>();
+
+
 
 // Add HttpClient para TasteDive
 builder.Services.AddHttpClient<TasteDiveService>();
 builder.Services.AddScoped<TasteDiveService>();
+
 
 // Cargar variables desde .env
 LoadEnvFile();
@@ -42,7 +45,6 @@ else
 // SIEMPRE registrar MovieService
 builder.Services.AddScoped<MovieService>();
 builder.Services.AddScoped<UserService>();
-
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -55,9 +57,11 @@ if (!app.Environment.IsDevelopment())
 app.UseStaticFiles();
 app.UseAntiforgery();
 
+app.UseRouting();
 app.MapStaticAssets();
-app.MapRazorComponents<App>()
-    .AddInteractiveServerRenderMode();
+app.MapBlazorHub();
+app.MapFallbackToPage("/_Host");
+
 
 var port = Environment.GetEnvironmentVariable("PORT") ?? "8080";
 app.Run($"http://0.0.0.0:{port}");

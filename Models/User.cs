@@ -15,7 +15,7 @@ public class User
 
 
     [Column("role")]
-    public string? Role { get; set; } = "user";
+    public string? Role { get; set; } = "User";
 
     [Required]
     [EmailAddress]
