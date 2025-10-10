@@ -1,7 +1,41 @@
-﻿@page "/"
-@page "/home"
-@page "/home/"
+@page "/"
+@using Microsoft.AspNetCore.Components.Authorization
+@inject AuthenticationStateProvider AuthStateProvider
 
+<PageTitle>MovieBox - Home</PageTitle>
 
-<h1>Hello, world!</h1>
-Welcome to your new app.
+<AuthorizeView Context="homeContext">
+    <Authorized>
+        <div class="text-center">
+            <h1 class="display-4">Hello, @(homeContext.User.Identity?.Name)! 👋</h1>
+            <p class="lead">Welcome back to MovieBox</p>
+            <div class="mt-4">
+                <p>Ready to explore your favorite movies?</p>
+                <a href="/movies" class="btn btn-primary btn-lg">Go to Movies</a>
+            </div>
+        </div>
+    </Authorized>
+    <NotAuthorized>
+        <div class="text-center">
+            <h1 class="display-4">Hello, world! 🌟</h1>
+            <p class="lead">Welcome to MovieBox</p>
+            <div class="mt-4">
+                <p>Discover and manage your favorite movies</p>
+                <div class="d-flex justify-content-center gap-3">
+                    <a href="/signin" class="btn btn-primary btn-lg">Sign In</a>
+                    <a href="/register" class="btn btn-outline-primary btn-lg">Register</a>
+                </div>
+            </div>
+        </div>
+    </NotAuthorized>
+</AuthorizeView>
+
+@code {
+    private string? userName;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthStateProvider.GetAuthenticationStateAsync();
+        userName = authState.User.Identity?.Name;
+    }
+}

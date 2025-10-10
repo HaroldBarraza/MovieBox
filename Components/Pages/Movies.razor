@@ -6,6 +6,7 @@
 @inject CommentService CommentService
 @inject NavigationManager Navigation
 @inject IJSRuntime JS
+@inject AuthenticationStateProvider AuthStateProvider
 
 <PageTitle>@(movie?.Title ?? "Detalles de Película")</PageTitle>
 
@@ -83,7 +84,6 @@ else
                         <div class="meta-item">
                             <strong>Calificación:</strong>
                             <div class="rating-container">
-                                <!-- 🔥 SISTEMA DE NÚMEROS MEJORADO -->
                                 <div class="rating-numbers-display">
                                     <span class="rating-badge">
                                         @averageRating.ToString("0.0")
@@ -92,7 +92,6 @@ else
                                     <span class="rating-count">(@comments.Count comentarios)</span>
                                 </div>
                                 
-                                <!-- Información de distribución -->
                                 @if (comments.Any())
                                 {
                                     <div class="rating-distribution mt-2">
@@ -124,15 +123,19 @@ else
                         </div>
                     }
 
-                    <!-- Botones de acción -->
-                    <div class="action-buttons-details mt-4">
-                        <button class="btn btn-primary me-2" @onclick="EditMovie">
-                            <span class="oi oi-pencil"></span> Editar Película
-                        </button>
-                        <button class="btn btn-outline-danger" @onclick="DeleteMovie">
-                            <span class="oi oi-trash"></span> Eliminar Película
-                        </button>
-                    </div>
+                    <!-- Botones de acción (solo para usuarios autenticados) -->
+                    <AuthorizeView Context="authContext">
+                        <Authorized>
+                            <div class="action-buttons-details mt-4">
+                                <button class="btn btn-primary me-2" @onclick="EditMovie">
+                                    <span class="oi oi-pencil"></span> Editar Película
+                                </button>
+                                <button class="btn btn-outline-danger" @onclick="DeleteMovie">
+                                    <span class="oi oi-trash"></span> Eliminar Película
+                                </button>
+                            </div>
+                        </Authorized>
+                    </AuthorizeView>
                 </div>
             </div>
         </div>
@@ -143,68 +146,105 @@ else
                 <div class="comments-section">
                     <h3 class="mb-4">Comentarios y Calificaciones</h3>
                     
-                    <!-- Formulario para agregar comentario -->
-                    <div class="card mb-4">
-                        <div class="card-body">
-                            <h5 class="card-title">Agregar Comentario</h5>
-                            <EditForm Model="@newComment" OnValidSubmit="AddComment">
-                                <DataAnnotationsValidator />
-                                
-                                <div class="row">
-                                    <div class="col-md-6 mb-3">
-                                        <label for="userName" class="form-label">Tu Nombre</label>
-                                        <InputText id="userName" @bind-Value="newComment.UserName" class="form-control" />
-                                        <ValidationMessage For="@(() => newComment.UserName)" class="text-danger" />
-                                    </div>
-                                    
-                                    <div class="col-md-6 mb-3">
-                                        <label for="ratingInput" class="form-label">Calificación (1-5)</label>
-                                        <div class="rating-input-container">
-                                            <!-- 🔥 INPUT NUMBER PARA ESCRIBIR DIRECTAMENTE -->
-                                            <InputNumber id="ratingInput" 
-                                                        @bind-Value="newComment.Rating" 
-                                                        class="form-control rating-input-number"
-                                                        min="1" 
-                                                        max="5" 
-                                                        step="1" />
-                                            <div class="rating-input-help">
-                                                <small class="text-muted">Escribe un número del 1 al 5</small>
+                    <!-- Formulario para agregar comentario (solo para usuarios autenticados) -->
+                    <AuthorizeView Context="commentContext">
+                        <Authorized>
+                            <div class="card mb-4">
+                                <div class="card-body">
+                                    <h5 class="card-title">Agregar Comentario</h5>
+                                    <EditForm Model="@newComment" OnValidSubmit="AddComment">
+                                        <DataAnnotationsValidator />
+
+                                        <!-- NOMBRE AUTOMÁTICO - NO EDITABLE -->
+                                        <div class="mb-3">
+                                            <label class="form-label fw-bold">Comentando como:</label>
+                                            <div class="form-control-plaintext bg-light p-2 rounded">
+                                                <strong>@commentContext.User.Identity?.Name</strong>
+                                            </div>
+                                            <small class="text-muted">Tu nombre se mostrará automáticamente con el comentario</small>
+                                        </div>
+
+                                        <div class="row">
+                                            <div class="col-md-12 mb-3">
+                                                <label for="ratingInput" class="form-label fw-bold">Calificación (1-5)</label>
+                                                <div class="rating-input-container">
+                                                    <!-- SELECTOR DE ESTRELLAS MEJORADO -->
+                                                    <div class="star-rating mb-2">
+                                                        @for (int i = 1; i <= 5; i++)
+                                                        {
+                                                            var starIndex = i;
+                                                            <span class="star @(i <= newComment.Rating ? "filled" : "")" 
+                                                                  @onclick="@(() => SetRating(starIndex))"
+                                                                  title="@i estrella@(i > 1 ? "s" : "")">
+                                                                ★
+                                                            </span>
+                                                        }
+                                                    </div>
+                                                    <InputNumber id="ratingInput" 
+                                                                @bind-Value="newComment.Rating" 
+                                                                class="form-control rating-input-number d-none"
+                                                                min="1" 
+                                                                max="5" 
+                                                                step="1" />
+                                                    <div class="rating-input-help">
+                                                        <small class="text-muted">Haz clic en las estrellas o escribe un número del 1 al 5</small>
+                                                    </div>
+                                                </div>
+                                                <ValidationMessage For="@(() => newComment.Rating)" class="text-danger" />
+
+                                                <div class="rating-preview mt-2">
+                                                    <small class="text-muted">
+                                                        Calificación seleccionada: 
+                                                        <span class="badge bg-warning text-dark">@newComment.Rating / 5</span>
+                                                    </small>
+                                                </div>
                                             </div>
                                         </div>
-                                        <ValidationMessage For="@(() => newComment.Rating)" class="text-danger" />
-                                        
-                                        <!-- Indicador visual -->
-                                        <div class="rating-preview mt-2">
-                                            <small class="text-muted">
-                                                Calificación seleccionada: 
-                                                <span class="badge bg-warning text-dark">@newComment.Rating / 5</span>
-                                            </small>
+
+                                        <div class="mb-3">
+                                            <label for="commentText" class="form-label fw-bold">Comentario</label>
+                                            <InputTextArea id="commentText" @bind-Value="newComment.Text" 
+                                                         class="form-control" rows="4" 
+                                                         placeholder="Escribe tu comentario aquí... ¿Qué te pareció la película?" />
+                                            <ValidationMessage For="@(() => newComment.Text)" class="text-danger" />
+                                            <small class="text-muted">Máximo 500 caracteres</small>
                                         </div>
-                                    </div>
+
+                                        <!-- BOTÓN TEMPORAL PARA TESTING -->
+                                        <button type="button" class="btn btn-primary" @onclick="AddComment" disabled="@isSubmitting">
+                                            @if (isSubmitting)
+                                            {
+                                                <span class="spinner-border spinner-border-sm" role="status"></span>
+                                                <span> Enviando...</span>
+                                            }
+                                            else
+                                            {
+                                                <span>Publicar Comentario</span>
+                                            }
+                                        </button>
+
+                                        <!-- BOTÓN ORIGINAL (COMENTADO TEMPORALMENTE) -->
+                                        @* <button type="submit" class="btn btn-primary" disabled="@isSubmitting">
+                                            @if (isSubmitting)
+                                            {
+                                                <span class="spinner-border spinner-border-sm" role="status"></span>
+                                                <span> Enviando...</span>
+                                            }
+                                            else
+                                            {
+                                                <span>Publicar Comentario</span>
+                                            }
+                                        </button> *@
+                                    </EditForm>
                                 </div>
-                                
-                                <div class="mb-3">
-                                    <label for="commentText" class="form-label">Comentario</label>
-                                    <InputTextArea id="commentText" @bind-Value="newComment.Text" 
-                                                 class="form-control" rows="4" 
-                                                 placeholder="Escribe tu comentario aquí..." />
-                                    <ValidationMessage For="@(() => newComment.Text)" class="text-danger" />
-                                </div>
-                                
-                                <button type="submit" class="btn btn-primary" disabled="@isSubmitting">
-                                    @if (isSubmitting)
-                                    {
-                                        <span class="spinner-border spinner-border-sm" role="status"></span>
-                                        <span> Enviando...</span>
-                                    }
-                                    else
-                                    {
-                                        <span>Publicar Comentario</span>
-                                    }
-                                </button>
-                            </EditForm>
-                        </div>
-                    </div>
+                            </div>
+                        </Authorized>
+                        <NotAuthorized>
+                            <div class="alert alert-info">
+                                <a href="/signin" class="btn btn-primary">Inicia sesión</a> para agregar comentarios y calificaciones.
+                            </div>
+                        </NotAuthorized>
+                    </AuthorizeView>
 
                     <!-- Lista de comentarios -->
                     <div class="comments-list">
@@ -234,30 +274,39 @@ else
                                         
                                         <p class="card-text">@comment.Text</p>
                                         
-                                        <!-- Sistema de votación para comentarios -->
-                                        <div class="comment-helpful mt-3">
-                                            <small class="text-muted me-3">
-                                                ¿Te pareció útil este comentario?
-                                            </small>
-                                            <button class="btn btn-sm btn-outline-success me-1" 
-                                                    @onclick="() => VoteComment(comment.Id, true)"
-                                                    title="Útil">
-                                                <span class="oi oi-thumb-up"></span> 
-                                                <span>@comment.HelpfulVotes</span>
-                                            </button>
-                                            <button class="btn btn-sm btn-outline-danger" 
-                                                    @onclick="() => VoteComment(comment.Id, false)"
-                                                    title="No útil">
-                                                <span class="oi oi-thumb-down"></span>
-                                                <span>@(comment.TotalVotes - comment.HelpfulVotes)</span>
-                                            </button>
-                                            @if (comment.TotalVotes > 0)
-                                            {
-                                                <small class="text-muted ms-2">
-                                                    (@comment.HelpfulScore.ToString("0")% útil)
-                                                </small>
-                                            }
-                                        </div>
+                                        <!-- Sistema de votación para comentarios (solo para usuarios autenticados) -->
+                                        <AuthorizeView Context="voteContext">
+                                            <Authorized>
+                                                <div class="comment-helpful mt-3">
+                                                    <small class="text-muted me-3">
+                                                        ¿Te pareció útil este comentario?
+                                                    </small>
+                                                    @{
+                                                        var currentCommentId = comment.Id;
+                                                        var isHelpfulTrue = true;
+                                                        var isHelpfulFalse = false;
+                                                    }
+                                                    <button class="btn btn-sm btn-outline-success me-1" 
+                                                            @onclick="@(() => VoteComment(currentCommentId, isHelpfulTrue))"
+                                                            title="Útil">
+                                                        <span class="oi oi-thumb-up"></span> 
+                                                        <span>@comment.HelpfulVotes</span>
+                                                    </button>
+                                                    <button class="btn btn-sm btn-outline-danger" 
+                                                            @onclick="@(() => VoteComment(currentCommentId, isHelpfulFalse))"
+                                                            title="No útil">
+                                                        <span class="oi oi-thumb-down"></span>
+                                                        <span>@(comment.TotalVotes - comment.HelpfulVotes)</span>
+                                                    </button>
+                                                    @if (comment.TotalVotes > 0)
+                                                    {
+                                                        <small class="text-muted ms-2">
+                                                            (@comment.HelpfulScore.ToString("0")% útil)
+                                                        </small>
+                                                    }
+                                                </div>
+                                            </Authorized>
+                                        </AuthorizeView>
                                     </div>
                                 </div>
                             }
@@ -269,265 +318,6 @@ else
     </div>
 }
 
-<style>
-    /* Estilos para el contenedor del póster */
-    .movie-poster-container {
-        text-align: center;
-        margin-bottom: 2rem;
-    }
-
-    .movie-poster-img {
-        width: 100%;
-        max-width: 400px;
-        height: auto;
-        border-radius: 12px;
-        box-shadow: 0 8px 25px rgba(0,0,0,0.15);
-    }
-
-    .poster-placeholder-details {
-        width: 100%;
-        max-width: 400px;
-        height: 500px;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: white;
-        border-radius: 12px;
-        margin: 0 auto;
-    }
-
-    .poster-placeholder-details .oi-image {
-        font-size: 4rem;
-        opacity: 0.7;
-    }
-
-    /* Estilos para el título */
-    .movie-title-details {
-        font-size: 2.5rem;
-        font-weight: 700;
-        color: #2c3e50;
-        margin-bottom: 1.5rem;
-        line-height: 1.2;
-    }
-
-    /* Estilos para la información meta */
-    .movie-meta-info {
-        background: #f8f9fa;
-        padding: 1.5rem;
-        border-radius: 8px;
-        margin-bottom: 2rem;
-    }
-
-    .meta-item {
-        margin-bottom: 1rem;
-        display: flex;
-        align-items: flex-start;
-    }
-
-    .meta-item:last-child {
-        margin-bottom: 0;
-    }
-
-    .meta-item strong {
-        min-width: 120px;
-        color: #495057;
-    }
-
-    .genre-badges {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 0.5rem;
-    }
-
-    .genre-badges .badge {
-        font-size: 0.8rem;
-        padding: 0.4em 0.8em;
-    }
-
-    .rating-container {
-        display: flex;
-        flex-direction: column;
-        gap: 0.5rem;
-    }
-
-
-    .rating-numbers-display {
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-    }
-
-    .rating-badge {
-        background: linear-gradient(135deg, #FFD700, #FFA500);
-        color: #000;
-        padding: 0.5rem 1rem;
-        border-radius: 8px;
-        font-size: 1.5rem;
-        font-weight: bold;
-        box-shadow: 0 2px 8px rgba(255, 215, 0, 0.3);
-    }
-
-    .rating-max {
-        font-size: 1rem;
-        color: #6c757d;
-        font-weight: 500;
-    }
-
-    .rating-count {
-        font-size: 0.9rem;
-        color: #6c757d;
-    }
-
-    .rating-distribution {
-        padding: 0.5rem;
-        background-color: #f8f9fa;
-        border-radius: 4px;
-        border-left: 3px solid #6c757d;
-    }
-
-    /* Estilos para el input de calificación */
-    .rating-input-container {
-        display: flex;
-        flex-direction: column;
-        gap: 0.5rem;
-    }
-
-    .rating-input-number {
-        max-width: 120px;
-        font-size: 1.1rem;
-        font-weight: bold;
-        text-align: center;
-        padding: 0.5rem;
-    }
-
-    .rating-input-help {
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-    }
-
-    .rating-preview {
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-    }
-
-    /* Estilos para las secciones de texto */
-    .description-section,
-    .plot-section {
-        margin-bottom: 2rem;
-    }
-
-    .description-section h3,
-    .plot-section h3 {
-        color: #2c3e50;
-        font-size: 1.5rem;
-        margin-bottom: 1rem;
-        font-weight: 600;
-    }
-
-    .movie-description,
-    .movie-plot {
-        font-size: 1.1rem;
-        line-height: 1.6;
-        color: #495057;
-        text-align: justify;
-    }
-
-    /* Botones de acción */
-    .action-buttons-details {
-        display: flex;
-        gap: 1rem;
-        flex-wrap: wrap;
-    }
-
-
-    .comments-section {
-        margin-top: 3rem;
-        padding-top: 2rem;
-        border-top: 1px solid #e9ecef;
-    }
-
-    .comment-card {
-        border: 1px solid #e9ecef;
-        transition: box-shadow 0.2s;
-    }
-
-    .comment-card:hover {
-        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-    }
-
-    .comment-helpful {
-        display: flex;
-        align-items: center;
-        flex-wrap: wrap;
-    }
-
-    /* Responsive */
-    @@media (max-width: 768px) {
-        .movie-title-details {
-            font-size: 2rem;
-        }
-
-        .meta-item {
-            flex-direction: column;
-            gap: 0.5rem;
-        }
-
-        .meta-item strong {
-            min-width: auto;
-        }
-
-        .poster-placeholder-details {
-            height: 400px;
-        }
-
-        .action-buttons-details {
-            flex-direction: column;
-        }
-
-        .action-buttons-details .btn {
-            width: 100%;
-            margin: 0.25rem 0;
-        }
-        
-        .comment-helpful {
-            flex-direction: column;
-            align-items: flex-start;
-            gap: 0.5rem;
-        }
-
-        .rating-numbers-display {
-            flex-wrap: wrap;
-        }
-    }
-
-    @@media (max-width: 576px) {
-        .movie-title-details {
-            font-size: 1.75rem;
-        }
-
-        .poster-placeholder-details {
-            height: 350px;
-        }
-
-        .movie-description,
-        .movie-plot {
-            font-size: 1rem;
-        }
-
-        .rating-badge {
-            font-size: 1.25rem;
-            padding: 0.4rem 0.8rem;
-        }
-
-        .rating-input-number {
-            max-width: 100px;
-        }
-    }
-</style>
-
 @code {
     [Parameter]
     public int Id { get; set; }
@@ -537,6 +327,12 @@ else
     private Comment newComment = new();
     private bool isSubmitting = false;
     private double averageRating = 0;
+
+    private void SetRating(int rating)
+    {
+        newComment.Rating = rating;
+        StateHasChanged();
+    }
 
     protected override async Task OnInitializedAsync()
     {
@@ -585,33 +381,101 @@ else
 
     private async Task AddComment()
     {
+        Console.WriteLine("=== INICIANDO ADDCOMMENT ===");
         isSubmitting = true;
+        StateHasChanged();
+        
         try
         {
+            Console.WriteLine("✅ AddComment method called");
+            
+            // Verificar datos del comentario
+            Console.WriteLine($"📝 Comment Data - Rating: {newComment.Rating}, Text: {newComment.Text}");
+            
             if (newComment.Rating < 1 || newComment.Rating > 5)
             {
+                Console.WriteLine("❌ Rating validation failed");
                 await JS.InvokeVoidAsync("alert", "La calificación debe ser entre 1 y 5");
                 return;
             }
 
-            newComment.MovieId = Id;
-            await CommentService.CreateCommentAsync(newComment);
+            if (string.IsNullOrWhiteSpace(newComment.Text))
+            {
+                Console.WriteLine("❌ Text validation failed");
+                await JS.InvokeVoidAsync("alert", "El comentario no puede estar vacío");
+                return;
+            }
+
+            // Verificar autenticación
+            var authState = await AuthStateProvider.GetAuthenticationStateAsync();
+            Console.WriteLine($"🔐 Auth State - IsAuthenticated: {authState.User.Identity?.IsAuthenticated}");
+            Console.WriteLine($"👤 User Name: {authState.User.Identity?.Name}");
             
+            if (!authState.User.Identity.IsAuthenticated)
+            {
+                Console.WriteLine("❌ User not authenticated");
+                await JS.InvokeVoidAsync("alert", "Debes iniciar sesión para comentar");
+                return;
+            }
+
+            var userName = authState.User.Identity?.Name ?? "Usuario Anónimo";
+            
+            Console.WriteLine($"🎯 Creating comment for user: {userName}");
+            
+            // Preparar el comentario
+            var commentToCreate = new Comment
+            {
+                UserName = userName,
+                Rating = newComment.Rating,
+                Text = newComment.Text,
+                MovieId = Id,
+                CreatedAt = DateTime.UtcNow
+            };
+
+            // Intentar crear comentario
+            Console.WriteLine("💾 Attempting to save comment to database...");
+            try
+            {
+                await CommentService.CreateCommentAsync(commentToCreate);
+                Console.WriteLine("✅ Comment saved successfully");
+            }
+            catch (Exception dbEx)
+            {
+                Console.WriteLine($"❌ Database error: {dbEx.Message}");
+                Console.WriteLine($"📋 StackTrace: {dbEx.StackTrace}");
+                await JS.InvokeVoidAsync("alert", $"Error de base de datos: {dbEx.Message}");
+                return;
+            }
+
+            // Limpiar formulario
             newComment = new Comment();
+            Console.WriteLine("🧹 Form cleared");
             
+            // Recargar datos
+            Console.WriteLine("🔄 Reloading comments and ratings...");
             await LoadComments();
             await LoadAverageRating();
+            Console.WriteLine("✅ Data reloaded");
             
-            await JS.InvokeVoidAsync("alert", "Comentario agregado exitosamente");
+            await JS.InvokeVoidAsync("alert", "✅ Comentario agregado exitosamente");
+            Console.WriteLine("🎉 Comment process completed successfully");
+            
         }
         catch (Exception ex)
         {
-            await JS.InvokeVoidAsync("alert", $"Error al agregar comentario: {ex.Message}");
+            Console.WriteLine($"💥 ERROR CRÍTICO en AddComment: {ex.Message}");
+            Console.WriteLine($"📋 StackTrace: {ex.StackTrace}");
+            if (ex.InnerException != null)
+            {
+                Console.WriteLine($"🔍 Inner Exception: {ex.InnerException.Message}");
+            }
+            await JS.InvokeVoidAsync("alert", $"❌ Error al agregar comentario: {ex.Message}");
         }
         finally
         {
             isSubmitting = false;
             StateHasChanged();
+            Console.WriteLine("=== FINALIZANDO ADDCOMMENT ===");
         }
     }
 
@@ -630,6 +494,7 @@ else
             await JS.InvokeVoidAsync("alert", $"Error al votar: {ex.Message}");
         }
     }
+
     private string GetRatingDistribution()
     {
         if (!comments.Any()) return "Sin datos";
@@ -690,3 +555,42 @@ else
         }
     }
 }
+
+<style>
+    /* Estilos para el sistema de estrellas */
+    .star-rating {
+        display: flex;
+        gap: 5px;
+        margin-bottom: 10px;
+    }
+
+    .star {
+        font-size: 2rem;
+        color: #ddd;
+        cursor: pointer;
+        transition: color 0.2s ease;
+        user-select: none;
+    }
+
+    .star.filled {
+        color: #FFD700;
+    }
+
+    .star:hover {
+        color: #FFA500;
+        transform: scale(1.1);
+    }
+
+    /* Estilos para el campo de nombre automático */
+    .form-control-plaintext.bg-light {
+        border: 1px solid #dee2e6;
+        background-color: #f8f9fa !important;
+    }
+
+    /* Responsive */
+    @@media (max-width: 768px) {
+        .star {
+            font-size: 1.5rem;
+        }
+    }
+</style>

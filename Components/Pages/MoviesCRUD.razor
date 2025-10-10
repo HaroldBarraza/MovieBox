@@ -1,21 +1,36 @@
 @page "/movies"
 @rendermode InteractiveServer
+@using System.Security.Claims
 @using MovieBox.Models
 @using MovieBox.Services
 @inject MovieService MovieService
 @inject OMDbService OMDbService
 @inject IJSRuntime JS
 @inject NavigationManager Navigation
-
+@inject AuthenticationStateProvider AuthStateProvider
 
 <PageTitle>Películas</PageTitle>
 
+<AuthorizeView Context="debugContext">
+    <NotAuthorized>
+        <div class="alert alert-warning m-2">
+            <small>DEBUG: Usuario NO autenticado</small>
+        </div>
+    </NotAuthorized>
+</AuthorizeView>
 <div class="container mt-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h3>Gestión de Películas</h3>
-        <button class="btn btn-primary" @onclick="ShowCreateModal">
-            <span class="oi oi-plus"></span> Nueva Película
-        </button>
+        <h3>Catálogo de Películas</h3>
+        <AuthorizeView>
+            <Authorized>
+                <button class="btn btn-primary" @onclick="ShowCreateModal">
+                    <span class="oi oi-plus"></span> Nueva Película
+                </button>
+            </Authorized>
+            <NotAuthorized>
+                <a href="/signin" class="btn btn-outline-primary">Iniciar sesión para agregar películas</a>
+            </NotAuthorized>
+        </AuthorizeView>
     </div>
 
     @if (movies == null)
@@ -29,7 +44,7 @@
     else if (!movies.Any())
     {
         <div class="alert alert-info">
-            No hay películas registradas. ¡Agrega la primera!
+            No hay películas registradas.
         </div>
     }
     else
@@ -42,7 +57,6 @@
                     <div class="card h-100 shadow-sm movie-card">
                         <!-- Contenedor centrado para la imagen -->
                         <div class="image-container">
-                            <!-- Imagen de la película (45% del ancho, centrada) -->
                             @if (!string.IsNullOrEmpty(movie.Poster) && movie.Poster != "N/A")
                             {
                                 <img src="@movie.Poster" 
@@ -98,343 +112,131 @@
     }
 </div>
 
-<!-- Modal para Crear/Editar -->
-@if (showModal)
-{
-    <div class="modal show d-block" style="background-color: rgba(0,0,0,0.5);" tabindex="-1">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">@(currentMovie.Id == 0 ? "Agregar Película" : "Editar Película")</h5>
-                    <button type="button" class="btn-close" @onclick="CloseModal"></button>
-                </div>
-                <div class="modal-body">
-                    <div class="row">
-                        <div class="col-md-6">
-                            <!-- Búsqueda y sugerencias -->
-                            <div class="mb-3">
-                                <label class="form-label">Buscar Película *</label>
-                                <div class="position-relative">
-                                    <input type="text" 
-                                           class="form-control" 
-                                           value="@searchQuery"
-                                           @oninput="HandleSearchInput"
-                                           placeholder="Escribe el nombre de la película..."
-                                           disabled="@isLoadingSuggestions" />
-                                    
-                                    @if (isLoadingSuggestions)
-                                    {
-                                        <div class="position-absolute top-50 end-0 translate-middle-y me-2">
-                                            <div class="spinner-border spinner-border-sm" role="status">
-                                                <span class="visually-hidden">Buscando...</span>
-                                            </div>
-                                        </div>
-                                    }
-                                </div>
-
-                                <!-- Lista de sugerencias -->
-                                @if (suggestions.Any() && !string.IsNullOrWhiteSpace(searchQuery))
-                                {
-                                    <div class="suggestions-list mt-2 border rounded">
-                                        @foreach (var suggestion in suggestions)
-                                        {
-                                            <div class="suggestion-item p-2 border-bottom" 
-                                                 @onclick="() => SelectSuggestion(suggestion)"
-                                                 style="cursor: pointer;">
-                                                <div class="d-flex align-items-center">
-                                                    @if (!string.IsNullOrEmpty(suggestion.Poster) && suggestion.Poster != "N/A")
-                                                    {
-                                                        <img src="@suggestion.Poster" 
-                                                             alt="@suggestion.Title" 
-                                                             style="width: 40px; height: 60px; object-fit: cover;"
-                                                             class="me-2" />
-                                                    }
-                                                    <div>
-                                                        <strong>@suggestion.Title</strong>
-                                                        <br />
-                                                        <small class="text-muted">@suggestion.Year • @suggestion.Type</small>
+<!-- Modal para Crear/Editar (solo para usuarios autenticados) -->
+<AuthorizeView>
+    <Authorized>
+        @if (showModal)
+        {
+            <div class="modal show d-block" style="background-color: rgba(0,0,0,0.5);" tabindex="-1">
+                <div class="modal-dialog modal-lg">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">@(currentMovie.Id == 0 ? "Agregar Película" : "Editar Película")</h5>
+                            <button type="button" class="btn-close" @onclick="CloseModal"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <!-- Búsqueda y sugerencias -->
+                                    <div class="mb-3">
+                                        <label class="form-label">Buscar Película *</label>
+                                        <div class="position-relative">
+                                            <input type="text" 
+                                                   class="form-control" 
+                                                   value="@searchQuery"
+                                                   @oninput="HandleSearchInput"
+                                                   placeholder="Escribe el nombre de la película..."
+                                                   disabled="@isLoadingSuggestions" />
+                                            
+                                            @if (isLoadingSuggestions)
+                                            {
+                                                <div class="position-absolute top-50 end-0 translate-middle-y me-2">
+                                                    <div class="spinner-border spinner-border-sm" role="status">
+                                                        <span class="visually-hidden">Buscando...</span>
                                                     </div>
                                                 </div>
+                                            }
+                                        </div>
+
+                                        <!-- Lista de sugerencias -->
+                                        @if (suggestions.Any() && !string.IsNullOrWhiteSpace(searchQuery))
+                                        {
+                                            <div class="suggestions-list mt-2 border rounded">
+                                                @foreach (var suggestion in suggestions)
+                                                {
+                                                    <div class="suggestion-item p-2 border-bottom" 
+                                                         @onclick="() => SelectSuggestion(suggestion)"
+                                                         style="cursor: pointer;">
+                                                        <div class="d-flex align-items-center">
+                                                            @if (!string.IsNullOrEmpty(suggestion.Poster) && suggestion.Poster != "N/A")
+                                                            {
+                                                                <img src="@suggestion.Poster" 
+                                                                     alt="@suggestion.Title" 
+                                                                     style="width: 40px; height: 60px; object-fit: cover;"
+                                                                     class="me-2" />
+                                                            }
+                                                            <div>
+                                                                <strong>@suggestion.Title</strong>
+                                                                <br />
+                                                                <small class="text-muted">@suggestion.Year • @suggestion.Type</small>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                }
                                             </div>
                                         }
                                     </div>
-                                }
-                            </div>
 
-                            <!-- Campos editables -->
-                            <div class="mb-3">
-                                <label class="form-label">Título *</label>
-                                <input type="text" class="form-control" @bind="currentMovie.Title" />
-                                @if (showTitleError)
-                                {
-                                    <small class="text-danger">El título es requerido</small>
-                                }
-                            </div>
+                                    <!-- Campos editables -->
+                                    <div class="mb-3">
+                                        <label class="form-label">Título *</label>
+                                        <input type="text" class="form-control" @bind="currentMovie.Title" />
+                                        @if (showTitleError)
+                                        {
+                                            <small class="text-danger">El título es requerido</small>
+                                        }
+                                    </div>
 
-                            <div class="mb-3">
-                                <label class="form-label">Género</label>
-                                <input type="text" class="form-control" @bind="currentMovie.Genre" 
-                                       placeholder="Ej: Action, Drama, Comedy" />
+                                    <div class="mb-3">
+                                        <label class="form-label">Género</label>
+                                        <input type="text" class="form-control" @bind="currentMovie.Genre" 
+                                               placeholder="Ej: Action, Drama, Comedy" />
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label class="form-label">Descripción</label>
+                                        <textarea class="form-control" rows="3" @bind="currentMovie.Description"
+                                                  placeholder="Breve descripción..."></textarea>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label class="form-label">Trama (Plot)</label>
+                                        <textarea class="form-control" rows="4" @bind="currentMovie.Plot"
+                                                  placeholder="Trama completa de la película..."></textarea>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label class="form-label">URL del Póster</label>
+                                        <input type="url" class="form-control" @bind="currentMovie.Poster" 
+                                               placeholder="https://example.com/poster.jpg" />
+                                        @if (!string.IsNullOrEmpty(currentMovie.Poster) && currentMovie.Poster != "N/A")
+                                        {
+                                            <div class="mt-2">
+                                                <img src="@currentMovie.Poster" 
+                                                     alt="Poster" 
+                                                     style="max-width: 200px; max-height: 300px;"
+                                                     class="img-thumbnail" />
+                                            </div>
+                                        }
+                                    </div>
+                                </div>
                             </div>
                         </div>
-
-                        <div class="col-md-6">
-                            <div class="mb-3">
-                                <label class="form-label">Descripción</label>
-                                <textarea class="form-control" rows="3" @bind="currentMovie.Description"
-                                          placeholder="Breve descripción..."></textarea>
-                            </div>
-
-                            <div class="mb-3">
-                                <label class="form-label">Trama (Plot)</label>
-                                <textarea class="form-control" rows="4" @bind="currentMovie.Plot"
-                                          placeholder="Trama completa de la película..."></textarea>
-                            </div>
-
-                            <div class="mb-3">
-                                <label class="form-label">URL del Póster</label>
-                                <input type="url" class="form-control" @bind="currentMovie.Poster" 
-                                       placeholder="https://example.com/poster.jpg" />
-                                @if (!string.IsNullOrEmpty(currentMovie.Poster) && currentMovie.Poster != "N/A")
-                                {
-                                    <div class="mt-2">
-                                        <img src="@currentMovie.Poster" 
-                                             alt="Poster" 
-                                             style="max-width: 200px; max-height: 300px;"
-                                             class="img-thumbnail" />
-                                    </div>
-                                }
-                            </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" @onclick="CloseModal">Cancelar</button>
+                            <button type="button" class="btn btn-primary" @onclick="SaveMovie" 
+                                    disabled="@(string.IsNullOrWhiteSpace(currentMovie.Title))">
+                                @(currentMovie.Id == 0 ? "Crear Película" : "Actualizar Película")
+                            </button>
                         </div>
                     </div>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" @onclick="CloseModal">Cancelar</button>
-                    <button type="button" class="btn btn-primary" @onclick="SaveMovie" 
-                            disabled="@(string.IsNullOrWhiteSpace(currentMovie.Title))">
-                        @(currentMovie.Id == 0 ? "Crear Película" : "Actualizar Película")
-                    </button>
-                </div>
             </div>
-        </div>
-    </div>
-}
-
-<style>
-    /* Estilos para la tarjeta de película */
-    .movie-card {
-        transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
-        border: none;
-        overflow: hidden;
-        border-radius: 12px;
-        display: flex;
-        flex-direction: column;
-        height: 100%;
-    }
-
-    .movie-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 8px 25px rgba(0,0,0,0.15);
-    }
-
-    /* Contenedor centrado para la imagen */
-    .image-container {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        padding: 2rem 1rem 1rem 1rem;
-        flex-shrink: 0;
-    }
-
-    /* Imagen de la película - 45% del ancho */
-    .movie-poster-img {
-        width: 45%;
-        height: auto;
-        max-height: 300px;
-        object-fit: cover;
-        border-radius: 8px;
-        transition: transform 0.3s ease;
-    }
-
-    .movie-card:hover .movie-poster-img {
-        transform: scale(1.05);
-    }
-
-    .poster-placeholder {
-        width: 45%;
-        height: 200px;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: white;
-        border-radius: 8px;
-    }
-
-    .poster-placeholder .oi-image {
-        font-size: 2rem;
-        opacity: 0.7;
-    }
-
-    /* Contenido de la tarjeta */
-    .card-body {
-        padding: 0 1.25rem 1.25rem 1.25rem;
-        display: flex;
-        flex-direction: column;
-        flex-grow: 1;
-    }
-
-    /* Título debajo de la imagen */
-    .movie-title {
-        font-size: 1.3rem;
-        font-weight: 700;
-        margin-bottom: 0.5rem;
-        line-height: 1.2;
-        color: #2c3e50;
-        text-align: center;
-    }
-
-    /* Género pequeño */
-    .movie-genre-container {
-        text-align: center;
-        margin-bottom: 1rem;
-    }
-
-    .movie-genre {
-        color: #6c757d;
-        font-size: 0.8rem;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-    }
-
-    /* Información de rating y duración */
-    .movie-info {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 1rem;
-        padding: 0 0.5rem;
-    }
-
-    .movie-rating {
-        display: flex;
-        align-items: center;
-    }
-
-    .rating-stars {
-        color: #FFD700;
-        font-size: 1rem;
-        margin-right: 0.5rem;
-    }
-
-    .rating-value {
-        font-size: 0.9rem;
-        font-weight: 600;
-        color: #495057;
-    }
-
-    .movie-duration {
-        font-size: 0.9rem;
-        color: #6c757d;
-        font-weight: 500;
-    }
-
-    /* Estilos para el botón Ver Detalles */
-    .btn-details {
-        background-color: #1a73e8;
-        color: white;
-        border: none;
-        border-radius: 6px;
-        padding: 10px 20px;
-        font-size: 0.9rem;
-        font-weight: 600;
-        transition: background-color 0.3s;
-        cursor: pointer;
-    }
-
-    .btn-details:hover {
-        background-color: #0d62d9;
-        color: white;
-    }
-
-    .action-buttons {
-        margin-top: auto;
-    }
-
-    /* Estilos para las sugerencias */
-    .suggestions-list {
-        background: white;
-        max-height: 300px;
-        overflow-y: auto;
-        z-index: 1000;
-        border-radius: 0.375rem;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-    }
-
-    .suggestion-item {
-        transition: background-color 0.15s ease;
-    }
-
-    .suggestion-item:hover {
-        background-color: #f8f9fa;
-    }
-
-    .suggestion-item:last-child {
-        border-bottom: none !important;
-    }
-
-    /* Responsive */
-    @@media (max-width: 768px) {
-        .movie-poster-img {
-            width: 55%;
-            max-height: 250px;
         }
-        
-        .poster-placeholder {
-            width: 55%;
-            height: 180px;
-        }
-        
-        .movie-title {
-            font-size: 1.2rem;
-        }
-        
-        .image-container {
-            padding: 1.5rem 1rem 0.5rem 1rem;
-        }
-    }
-
-    @@media (max-width: 576px) {
-        .movie-poster-img {
-            width: 65%;
-            max-height: 220px;
-        }
-        
-        .poster-placeholder {
-            width: 65%;
-            height: 160px;
-        }
-        
-        .movie-title {
-            font-size: 1.1rem;
-        }
-        
-        .btn-details {
-            font-size: 0.8rem;
-            padding: 8px 16px;
-        }
-        
-        .movie-info {
-            flex-direction: column;
-            gap: 0.5rem;
-            text-align: center;
-        }
-        
-        .image-container {
-            padding: 1rem 1rem 0.5rem 1rem;
-        }
-    }
-</style>
+    </Authorized>
+</AuthorizeView>
 
 @code {
     private List<Movie>? movies;
@@ -468,7 +270,6 @@
     {
         searchQuery = e.Value?.ToString() ?? "";
         
-        // Cancelar búsqueda anterior
         searchCancellationTokenSource?.Cancel();
         searchCancellationTokenSource = new System.Threading.CancellationTokenSource();
         
@@ -477,7 +278,7 @@
 
     private async Task SearchMoviesDelayed(System.Threading.CancellationToken cancellationToken)
     {
-        await Task.Delay(500); // Esperar 500ms después de que el usuario deje de escribir
+        await Task.Delay(500);
         
         if (cancellationToken.IsCancellationRequested || string.IsNullOrWhiteSpace(searchQuery) || searchQuery.Length < 2)
         {
@@ -514,19 +315,16 @@
     {
         try
         {
-            // Obtener detalles completos de la película
             var details = await OMDbService.GetMovieDetailsAsync(suggestion.imdbID);
             
             if (details != null)
             {
-                // Autorellenar los campos
                 currentMovie.Title = details.Title;
                 currentMovie.Description = details.Plot.Length > 200 ? details.Plot.Substring(0, 200) + "..." : details.Plot;
                 currentMovie.Plot = details.Plot;
                 currentMovie.Genre = details.Genre?.Split(',').FirstOrDefault()?.Trim() ?? "";
                 currentMovie.Poster = details.Poster != "N/A" ? details.Poster : "";
                 
-                // Limpiar sugerencias
                 suggestions.Clear();
                 searchQuery = "";
                 StateHasChanged();
@@ -543,11 +341,6 @@
         Navigation.NavigateTo($"/movies/{movieId}");
     }
 
-    private string TruncateDescription(string description, int length = 100)
-    {
-        return description.Length > length ? description.Substring(0, length) + "..." : description;
-    }
-
     private void ShowCreateModal()
     {
         currentMovie = new Movie();
@@ -556,11 +349,6 @@
         showModal = true;
         showTitleError = false;
         StateHasChanged();
-    }
-
-    private void ShowEditModal(Movie movie)
-    {
-        Navigation.NavigateTo($"/movies/edit/{movie.Id}");
     }
 
     private void CloseModal()
@@ -607,10 +395,5 @@
     private async Task ShowAlert(string message)
     {
         await JS.InvokeVoidAsync("alert", message);
-    }
-
-    private async Task<bool> ShowConfirm(string message)
-    {
-        return await JS.InvokeAsync<bool>("confirm", message);
     }
 }

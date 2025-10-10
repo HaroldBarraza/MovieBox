@@ -1,0 +1,118 @@
+@page "/signin"
+@rendermode InteractiveServer
+@using System.ComponentModel.DataAnnotations
+@using Microsoft.AspNetCore.Components.Forms
+@using MovieBox.Authentication
+@using MovieBox.Models
+@using MovieBox.Services
+@inject UserService UserService
+@inject NavigationManager NavigationManager
+@inject AuthenticationStateProvider AuthStateProvider
+@inject IJSRuntime JS
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">Sign In</h4>
+                </div>
+                <div class="card-body">
+                    <EditForm Model="@signinModel" OnValidSubmit="HandleValidSubmit" FormName="SigninForm">
+                        <DataAnnotationsValidator />
+                        
+                        @if (!string.IsNullOrEmpty(signinError))
+                        {
+                            <div class="alert alert-danger">@signinError</div>
+                        }
+                        
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Email</label>
+                            <InputText id="email" placeholder="Enter your email" 
+                                      class="form-control" Name="Email"
+                                      @bind-Value="signinModel.Email" />
+                            <ValidationMessage For="() => signinModel.Email" />
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="password" class="form-label">Password</label>
+                            <InputText id="password" type="password"
+                                      placeholder="Enter your password" 
+                                      class="form-control" Name="Password"
+                                      @bind-Value="signinModel.Password" />
+                            <ValidationMessage For="() => signinModel.Password" />
+                        </div>
+
+                        <button type="submit" class="btn btn-primary w-100" disabled="@isLoading">
+                            @if (isLoading)
+                            {
+                                <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                                <span class="ms-2">Signing in...</span>
+                            }
+                            else
+                            {
+                                <span>Sign In</span>
+                            }
+                        </button>
+                    </EditForm>
+                    
+                    <div class="text-center mt-3">
+                        <small class="text-muted">
+                            Don't have an account? 
+                            <a href="/register" class="text-decoration-none">Register here</a>
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    private SigninModel signinModel = new SigninModel();
+    private string signinError = "";
+    private bool isLoading = false;
+
+    async Task HandleValidSubmit(EditContext formContext)
+    {
+        signinError = "";
+        isLoading = true;
+        StateHasChanged();
+        
+        try
+        {
+            var userAccount = await UserService.SignInAsync(signinModel);
+            if (userAccount != null)
+            {
+                var customAuthStateProvider = (CustomAuthenticationStateProvider)AuthStateProvider;
+                
+                var userSession = new UserSession
+                {
+                    UserId = userAccount.Id,
+                    UserName = userAccount.Username,
+                    Email = userAccount.Email,
+                    Role = userAccount.Role
+                };
+                
+                // 🔥 ACTUALIZAR ESTADO DE AUTENTICACIÓN
+                await customAuthStateProvider.UpdateAuthenticationState(userSession);
+                
+                Console.WriteLine($"=== LOGIN SUCCESSFUL ===");
+                Console.WriteLine($"User: {userAccount.Username}");
+                Console.WriteLine($"Email: {userAccount.Email}");
+                Console.WriteLine($"Role: {userAccount.Role}");
+                Console.WriteLine($"=== END LOGIN ===");
+
+                // 🔥 FORZAR NAVEGACIÓN COMPLETA
+                NavigationManager.NavigateTo("/", true);
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Sign in error: {ex}");
+            signinError = "Invalid email or password.";
+            isLoading = false;
+            StateHasChanged();
+        }
+    }
+}

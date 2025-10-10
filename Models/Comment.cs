@@ -17,7 +17,6 @@ namespace MovieBox.Models
         [Range(1, 5, ErrorMessage = "La calificación debe ser entre 1 y 5 estrellas")]
         public int Rating { get; set; }
         
-        //Usar DateTime.UtcNow en lugar de DateTime.Now
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         
         public int HelpfulVotes { get; set; }

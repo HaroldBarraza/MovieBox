@@ -1,6 +1,15 @@
-﻿<div class="top-row ps-3 navbar navbar-dark">
+﻿@using Microsoft.AspNetCore.Components.Authorization
+
+<div class="top-row ps-3 navbar navbar-dark">
     <div class="container-fluid">
         <a class="navbar-brand" href="">MovieBox</a>
+        <AuthorizeView>
+            <Authorized>
+                <span class="navbar-text ms-3">
+                    Welcome, @context.User.Identity?.Name!
+                </span>
+            </Authorized>
+        </AuthorizeView>
     </div>
 </div>
 
@@ -14,22 +23,42 @@
             </NavLink>
         </div>
 
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="counter">
-                <span class="bi bi-plus-square-fill-nav-menu" aria-hidden="true"></span> Counter
-            </NavLink>
-        </div>
-
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="weather">
-                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Weather
-            </NavLink>
-        </div>
+        <!-- 🔥 ENLACE PÚBLICO PARA PELÍCULAS -->
         <div class="nav-item px-3">
             <NavLink class="nav-link" href="movies">
                 <span class="bi bi-film" aria-hidden="true"></span> Películas
             </NavLink>
         </div>
+
+        <AuthorizeView>
+            <Authorized>
+                <!-- Enlaces que solo ven usuarios autenticados -->
+                <div class="nav-item px-3">
+                    <NavLink class="nav-link" href="counter">
+                        <span class="bi bi-plus-square-fill-nav-menu" aria-hidden="true"></span> Counter
+                    </NavLink>
+                </div>
+
+                <div class="nav-item px-3">
+                    <NavLink class="nav-link" href="weather">
+                        <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Weather
+                    </NavLink>
+                </div>
+            </Authorized>
+            <NotAuthorized>
+                <!-- Enlaces que solo ven usuarios NO autenticados -->
+                <div class="nav-item px-3">
+                    <NavLink class="nav-link" href="signin">
+                        <span class="bi bi-box-arrow-in-right" aria-hidden="true"></span> Login
+                    </NavLink>
+                </div>
+                
+                <div class="nav-item px-3">
+                    <NavLink class="nav-link" href="register">
+                        <span class="bi bi-person-plus" aria-hidden="true"></span> Register
+                    </NavLink>
+                </div>
+            </NotAuthorized>
+        </AuthorizeView>
     </nav>
 </div>
-
