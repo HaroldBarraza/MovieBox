@@ -1,0 +1,596 @@
+@page "/movies/{id:int}"
+@rendermode InteractiveServer
+@using MovieBox.Models
+@using MovieBox.Services
+@inject MovieService MovieService
+@inject CommentService CommentService
+@inject NavigationManager Navigation
+@inject IJSRuntime JS
+@inject AuthenticationStateProvider AuthStateProvider
+
+<PageTitle>@(movie?.Title ?? "Detalles de Película")</PageTitle>
+
+@if (movie == null)
+{
+    <div class="container mt-4">
+        <div class="text-center">
+            <div class="spinner-border" role="status">
+                <span class="visually-hidden">Cargando...</span>
+            </div>
+            <p class="mt-2">Cargando detalles de la película...</p>
+        </div>
+    </div>
+}
+else
+{
+    <div class="container mt-4">
+        <!-- Botón de volver -->
+        <div class="mb-4">
+            <button class="btn btn-outline-secondary" @onclick="GoBack">
+                <span class="oi oi-arrow-left"></span> Volver a la lista
+            </button>
+        </div>
+
+        <!-- Contenido principal -->
+        <div class="row">
+            <!-- Columna de la imagen -->
+            <div class="col-md-4 mb-4">
+                <div class="movie-poster-container">
+                    @if (!string.IsNullOrEmpty(movie.Poster) && movie.Poster != "N/A")
+                    {
+                        <img src="@movie.Poster" 
+                             class="movie-poster-img" 
+                             alt="@movie.Title"
+                             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                        <div class="poster-placeholder-details" style="display: none;">
+                            <span class="oi oi-image"></span>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="poster-placeholder-details">
+                            <span class="oi oi-image"></span>
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <!-- Columna de la información -->
+            <div class="col-md-8">
+                <div class="movie-details-content">
+                    <!-- Título -->
+                    <h1 class="movie-title-details">@movie.Title</h1>
+
+                    <!-- Información básica -->
+                    <div class="movie-meta-info">
+                        @if (!string.IsNullOrEmpty(movie.Genre))
+                        {
+                            <div class="meta-item">
+                                <strong>Género:</strong>
+                                <span class="genre-badges">
+                                    @foreach (var genre in movie.Genre.Split(','))
+                                    {
+                                        <span class="badge bg-primary">@genre.Trim()</span>
+                                    }
+                                </span>
+                            </div>
+                        }
+
+                        <div class="meta-item">
+                            <strong>Duración:</strong>
+                            <span>@(GetMovieDuration())</span>
+                        </div>
+
+                        <div class="meta-item">
+                            <strong>Calificación:</strong>
+                            <div class="rating-container">
+                                <div class="rating-numbers-display">
+                                    <span class="rating-badge">
+                                        @averageRating.ToString("0.0")
+                                    </span>
+                                    <span class="rating-max">/ 5.0</span>
+                                    <span class="rating-count">(@comments.Count comentarios)</span>
+                                </div>
+                                
+                                @if (comments.Any())
+                                {
+                                    <div class="rating-distribution mt-2">
+                                        <small class="text-muted">
+                                            <strong>Distribución:</strong> 
+                                            @GetRatingDistribution()
+                                        </small>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Descripción -->
+                    @if (!string.IsNullOrEmpty(movie.Description))
+                    {
+                        <div class="description-section">
+                            <h3>Descripción</h3>
+                            <p class="movie-description">@movie.Description</p>
+                        </div>
+                    }
+
+                    <!-- Trama completa -->
+                    @if (!string.IsNullOrEmpty(movie.Plot) && movie.Plot != movie.Description)
+                    {
+                        <div class="plot-section">
+                            <h3>Trama</h3>
+                            <p class="movie-plot">@movie.Plot</p>
+                        </div>
+                    }
+
+                    <!-- Botones de acción (solo para usuarios autenticados) -->
+                    <AuthorizeView Context="authContext">
+                        <Authorized>
+                            <div class="action-buttons-details mt-4">
+                                <button class="btn btn-primary me-2" @onclick="EditMovie">
+                                    <span class="oi oi-pencil"></span> Editar Película
+                                </button>
+                                <button class="btn btn-outline-danger" @onclick="DeleteMovie">
+                                    <span class="oi oi-trash"></span> Eliminar Película
+                                </button>
+                            </div>
+                        </Authorized>
+                    </AuthorizeView>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECCIÓN DE COMENTARIOS -->
+        <div class="row mt-5">
+            <div class="col-12">
+                <div class="comments-section">
+                    <h3 class="mb-4">Comentarios y Calificaciones</h3>
+                    
+                    <!-- Formulario para agregar comentario (solo para usuarios autenticados) -->
+                    <AuthorizeView Context="commentContext">
+                        <Authorized>
+                            <div class="card mb-4">
+                                <div class="card-body">
+                                    <h5 class="card-title">Agregar Comentario</h5>
+                                    <EditForm Model="@newComment" OnValidSubmit="AddComment">
+                                        <DataAnnotationsValidator />
+
+                                        <!-- NOMBRE AUTOMÁTICO - NO EDITABLE -->
+                                        <div class="mb-3">
+                                            <label class="form-label fw-bold">Comentando como:</label>
+                                            <div class="form-control-plaintext bg-light p-2 rounded">
+                                                <strong>@commentContext.User.Identity?.Name</strong>
+                                            </div>
+                                            <small class="text-muted">Tu nombre se mostrará automáticamente con el comentario</small>
+                                        </div>
+
+                                        <div class="row">
+                                            <div class="col-md-12 mb-3">
+                                                <label for="ratingInput" class="form-label fw-bold">Calificación (1-5)</label>
+                                                <div class="rating-input-container">
+                                                    <!-- SELECTOR DE ESTRELLAS MEJORADO -->
+                                                    <div class="star-rating mb-2">
+                                                        @for (int i = 1; i <= 5; i++)
+                                                        {
+                                                            var starIndex = i;
+                                                            <span class="star @(i <= newComment.Rating ? "filled" : "")" 
+                                                                  @onclick="@(() => SetRating(starIndex))"
+                                                                  title="@i estrella@(i > 1 ? "s" : "")">
+                                                                ★
+                                                            </span>
+                                                        }
+                                                    </div>
+                                                    <InputNumber id="ratingInput" 
+                                                                @bind-Value="newComment.Rating" 
+                                                                class="form-control rating-input-number d-none"
+                                                                min="1" 
+                                                                max="5" 
+                                                                step="1" />
+                                                    <div class="rating-input-help">
+                                                        <small class="text-muted">Haz clic en las estrellas o escribe un número del 1 al 5</small>
+                                                    </div>
+                                                </div>
+                                                <ValidationMessage For="@(() => newComment.Rating)" class="text-danger" />
+
+                                                <div class="rating-preview mt-2">
+                                                    <small class="text-muted">
+                                                        Calificación seleccionada: 
+                                                        <span class="badge bg-warning text-dark">@newComment.Rating / 5</span>
+                                                    </small>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="mb-3">
+                                            <label for="commentText" class="form-label fw-bold">Comentario</label>
+                                            <InputTextArea id="commentText" @bind-Value="newComment.Text" 
+                                                         class="form-control" rows="4" 
+                                                         placeholder="Escribe tu comentario aquí... ¿Qué te pareció la película?" />
+                                            <ValidationMessage For="@(() => newComment.Text)" class="text-danger" />
+                                            <small class="text-muted">Máximo 500 caracteres</small>
+                                        </div>
+
+                                        <!-- BOTÓN TEMPORAL PARA TESTING -->
+                                        <button type="button" class="btn btn-primary" @onclick="AddComment" disabled="@isSubmitting">
+                                            @if (isSubmitting)
+                                            {
+                                                <span class="spinner-border spinner-border-sm" role="status"></span>
+                                                <span> Enviando...</span>
+                                            }
+                                            else
+                                            {
+                                                <span>Publicar Comentario</span>
+                                            }
+                                        </button>
+
+                                        <!-- BOTÓN ORIGINAL (COMENTADO TEMPORALMENTE) -->
+                                        @* <button type="submit" class="btn btn-primary" disabled="@isSubmitting">
+                                            @if (isSubmitting)
+                                            {
+                                                <span class="spinner-border spinner-border-sm" role="status"></span>
+                                                <span> Enviando...</span>
+                                            }
+                                            else
+                                            {
+                                                <span>Publicar Comentario</span>
+                                            }
+                                        </button> *@
+                                    </EditForm>
+                                </div>
+                            </div>
+                        </Authorized>
+                        <NotAuthorized>
+                            <div class="alert alert-info">
+                                <a href="/signin" class="btn btn-primary">Inicia sesión</a> para agregar comentarios y calificaciones.
+                            </div>
+                        </NotAuthorized>
+                    </AuthorizeView>
+
+                    <!-- Lista de comentarios -->
+                    <div class="comments-list">
+                        @if (!comments.Any())
+                        {
+                            <div class="text-center py-4">
+                                <p class="text-muted">No hay comentarios aún. ¡Sé el primero en comentar!</p>
+                            </div>
+                        }
+                        else
+                        {
+                            foreach (var comment in comments)
+                            {
+                                <div class="card comment-card mb-3">
+                                    <div class="card-body">
+                                        <div class="d-flex justify-content-between align-items-start mb-2">
+                                            <div>
+                                                <h6 class="card-subtitle mb-1 text-primary">@comment.UserName</h6>
+                                                <small class="text-muted">@comment.CreatedAt.ToString("dd/MM/yyyy HH:mm")</small>
+                                            </div>
+                                            <div class="comment-rating">
+                                                <span class="badge bg-warning text-dark">
+                                                    @comment.Rating / 5
+                                                </span>
+                                            </div>
+                                        </div>
+                                        
+                                        <p class="card-text">@comment.Text</p>
+                                        
+                                        <!-- Sistema de votación para comentarios (solo para usuarios autenticados) -->
+                                        <AuthorizeView Context="voteContext">
+                                            <Authorized>
+                                                <div class="comment-helpful mt-3">
+                                                    <small class="text-muted me-3">
+                                                        ¿Te pareció útil este comentario?
+                                                    </small>
+                                                    @{
+                                                        var currentCommentId = comment.Id;
+                                                        var isHelpfulTrue = true;
+                                                        var isHelpfulFalse = false;
+                                                    }
+                                                    <button class="btn btn-sm btn-outline-success me-1" 
+                                                            @onclick="@(() => VoteComment(currentCommentId, isHelpfulTrue))"
+                                                            title="Útil">
+                                                        <span class="oi oi-thumb-up"></span> 
+                                                        <span>@comment.HelpfulVotes</span>
+                                                    </button>
+                                                    <button class="btn btn-sm btn-outline-danger" 
+                                                            @onclick="@(() => VoteComment(currentCommentId, isHelpfulFalse))"
+                                                            title="No útil">
+                                                        <span class="oi oi-thumb-down"></span>
+                                                        <span>@(comment.TotalVotes - comment.HelpfulVotes)</span>
+                                                    </button>
+                                                    @if (comment.TotalVotes > 0)
+                                                    {
+                                                        <small class="text-muted ms-2">
+                                                            (@comment.HelpfulScore.ToString("0")% útil)
+                                                        </small>
+                                                    }
+                                                </div>
+                                            </Authorized>
+                                        </AuthorizeView>
+                                    </div>
+                                </div>
+                            }
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+
+    private Movie? movie;
+    private List<Comment> comments = new();
+    private Comment newComment = new();
+    private bool isSubmitting = false;
+    private double averageRating = 0;
+
+    private void SetRating(int rating)
+    {
+        newComment.Rating = rating;
+        StateHasChanged();
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadMovie();
+        await LoadComments();
+        await LoadAverageRating();
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        await LoadMovie();
+        await LoadComments();
+        await LoadAverageRating();
+    }
+
+    private async Task LoadMovie()
+    {
+        try
+        {
+            if (Id > 0)
+            {
+                movie = await MovieService.GetMovieAsync(Id);
+            }
+        }
+        catch (Exception ex)
+        {
+            await JS.InvokeVoidAsync("alert", $"Error al cargar la película: {ex.Message}");
+        }
+    }
+
+    private async Task LoadComments()
+    {
+        if (Id > 0)
+        {
+            comments = await CommentService.GetCommentsByMovieAsync(Id);
+        }
+    }
+
+    private async Task LoadAverageRating()
+    {
+        if (Id > 0)
+        {
+            averageRating = await CommentService.GetMovieAverageRatingAsync(Id);
+        }
+    }
+
+    private async Task AddComment()
+    {
+        Console.WriteLine("=== INICIANDO ADDCOMMENT ===");
+        isSubmitting = true;
+        StateHasChanged();
+        
+        try
+        {
+            Console.WriteLine("✅ AddComment method called");
+            
+            // Verificar datos del comentario
+            Console.WriteLine($"📝 Comment Data - Rating: {newComment.Rating}, Text: {newComment.Text}");
+            
+            if (newComment.Rating < 1 || newComment.Rating > 5)
+            {
+                Console.WriteLine("❌ Rating validation failed");
+                await JS.InvokeVoidAsync("alert", "La calificación debe ser entre 1 y 5");
+                return;
+            }
+
+            if (string.IsNullOrWhiteSpace(newComment.Text))
+            {
+                Console.WriteLine("❌ Text validation failed");
+                await JS.InvokeVoidAsync("alert", "El comentario no puede estar vacío");
+                return;
+            }
+
+            // Verificar autenticación
+            var authState = await AuthStateProvider.GetAuthenticationStateAsync();
+            Console.WriteLine($"🔐 Auth State - IsAuthenticated: {authState.User.Identity?.IsAuthenticated}");
+            Console.WriteLine($"👤 User Name: {authState.User.Identity?.Name}");
+            
+            if (!authState.User.Identity.IsAuthenticated)
+            {
+                Console.WriteLine("❌ User not authenticated");
+                await JS.InvokeVoidAsync("alert", "Debes iniciar sesión para comentar");
+                return;
+            }
+
+            var userName = authState.User.Identity?.Name ?? "Usuario Anónimo";
+            
+            Console.WriteLine($"🎯 Creating comment for user: {userName}");
+            
+            // Preparar el comentario
+            var commentToCreate = new Comment
+            {
+                UserName = userName,
+                Rating = newComment.Rating,
+                Text = newComment.Text,
+                MovieId = Id,
+                CreatedAt = DateTime.UtcNow
+            };
+
+            // Intentar crear comentario
+            Console.WriteLine("💾 Attempting to save comment to database...");
+            try
+            {
+                await CommentService.CreateCommentAsync(commentToCreate);
+                Console.WriteLine("✅ Comment saved successfully");
+            }
+            catch (Exception dbEx)
+            {
+                Console.WriteLine($"❌ Database error: {dbEx.Message}");
+                Console.WriteLine($"📋 StackTrace: {dbEx.StackTrace}");
+                await JS.InvokeVoidAsync("alert", $"Error de base de datos: {dbEx.Message}");
+                return;
+            }
+
+            // Limpiar formulario
+            newComment = new Comment();
+            Console.WriteLine("🧹 Form cleared");
+            
+            // Recargar datos
+            Console.WriteLine("🔄 Reloading comments and ratings...");
+            await LoadComments();
+            await LoadAverageRating();
+            Console.WriteLine("✅ Data reloaded");
+            
+            await JS.InvokeVoidAsync("alert", "✅ Comentario agregado exitosamente");
+            Console.WriteLine("🎉 Comment process completed successfully");
+            
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"💥 ERROR CRÍTICO en AddComment: {ex.Message}");
+            Console.WriteLine($"📋 StackTrace: {ex.StackTrace}");
+            if (ex.InnerException != null)
+            {
+                Console.WriteLine($"🔍 Inner Exception: {ex.InnerException.Message}");
+            }
+            await JS.InvokeVoidAsync("alert", $"❌ Error al agregar comentario: {ex.Message}");
+        }
+        finally
+        {
+            isSubmitting = false;
+            StateHasChanged();
+            Console.WriteLine("=== FINALIZANDO ADDCOMMENT ===");
+        }
+    }
+
+    private async Task VoteComment(int commentId, bool isHelpful)
+    {
+        try
+        {
+            var success = await CommentService.VoteCommentAsync(commentId, isHelpful);
+            if (success)
+            {
+                await LoadComments(); 
+            }
+        }
+        catch (Exception ex)
+        {
+            await JS.InvokeVoidAsync("alert", $"Error al votar: {ex.Message}");
+        }
+    }
+
+    private string GetRatingDistribution()
+    {
+        if (!comments.Any()) return "Sin datos";
+
+        var distribution = new Dictionary<int, int>();
+        for (int i = 1; i <= 5; i++)
+        {
+            distribution[i] = comments.Count(c => c.Rating == i);
+        }
+
+        return string.Join(" | ", distribution.Select(d => $"{d.Key}★: {d.Value}"));
+    }
+
+    private string GetMovieDuration()
+    {
+        return "2h 22m";
+    }
+
+    private void GoBack()
+    {
+        Navigation.NavigateTo("/movies");
+    }
+
+    private void EditMovie()
+    {
+        if (movie != null)
+        {
+            Navigation.NavigateTo($"/movies/edit/{movie.Id}");
+        }
+    }
+
+    private async Task DeleteMovie()
+    {
+        if (movie == null) return;
+
+        var confirmed = await JS.InvokeAsync<bool>("confirm", 
+            $"¿Estás seguro de que quieres eliminar \"{movie.Title}\"? Esta acción no se puede deshacer.");
+
+        if (confirmed)
+        {
+            try
+            {
+                var success = await MovieService.DeleteMovieAsync(movie.Id);
+                if (success)
+                {
+                    await JS.InvokeVoidAsync("alert", "Película eliminada exitosamente");
+                    Navigation.NavigateTo("/movies");
+                }
+                else
+                {
+                    await JS.InvokeVoidAsync("alert", "No se pudo encontrar la película para eliminar");
+                }
+            }
+            catch (Exception ex)
+            {
+                await JS.InvokeVoidAsync("alert", $"Error al eliminar: {ex.Message}");
+            }
+        }
+    }
+}
+
+<style>
+    /* Estilos para el sistema de estrellas */
+    .star-rating {
+        display: flex;
+        gap: 5px;
+        margin-bottom: 10px;
+    }
+
+    .star {
+        font-size: 2rem;
+        color: #ddd;
+        cursor: pointer;
+        transition: color 0.2s ease;
+        user-select: none;
+    }
+
+    .star.filled {
+        color: #FFD700;
+    }
+
+    .star:hover {
+        color: #FFA500;
+        transform: scale(1.1);
+    }
+
+    /* Estilos para el campo de nombre automático */
+    .form-control-plaintext.bg-light {
+        border: 1px solid #dee2e6;
+        background-color: #f8f9fa !important;
+    }
+
+    /* Responsive */
+    @@media (max-width: 768px) {
+        .star {
+            font-size: 1.5rem;
+        }
+    }
+</style>
