@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("MOVIEBOX")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+51fcb6a8c051d6c53511146614812a02d0b215c3")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+3fb12c3e2112df8f86b53b60d8ece8d46bcdd56e")]
 [assembly: System.Reflection.AssemblyProductAttribute("MOVIEBOX")]
 [assembly: System.Reflection.AssemblyTitleAttribute("MOVIEBOX")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

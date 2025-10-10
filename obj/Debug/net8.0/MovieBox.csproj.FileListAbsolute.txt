@@ -1,6 +1,17 @@
 E:\BYU\code\Next.js\movie box rama\MovieBox-Cooments\MovieBox-Comments\bin\Debug\net8.0\appsettings.Development.json
 E:\BYU\code\Next.js\movie box rama\MovieBox-Cooments\MovieBox-Comments\bin\Debug\net8.0\appsettings.json
 E:\BYU\code\Next.js\movie box rama\MovieBox-Cooments\MovieBox-Comments\bin\Debug\net8.0\rewrites.json
+E:\BYU\code\Next.js\movie box rama\MovieBox-Cooments\MovieBox-Comments\bin\Debug\net8.0\BlazorDebugProxy\BrowserDebugHost.dll
+E:\BYU\code\Next.js\movie box rama\MovieBox-Cooments\MovieBox-Comments\bin\Debug\net8.0\BlazorDebugProxy\BrowserDebugHost.runtimeconfig.json
+E:\BYU\code\Next.js\movie box rama\MovieBox-Cooments\MovieBox-Comments\bin\Debug\net8.0\BlazorDebugProxy\BrowserDebugProxy.dll
+E:\BYU\code\Next.js\movie box rama\MovieBox-Cooments\MovieBox-Comments\bin\Debug\net8.0\BlazorDebugProxy\Microsoft.CodeAnalysis.CSharp.dll
+E:\BYU\code\Next.js\movie box rama\MovieBox-Cooments\MovieBox-Comments\bin\Debug\net8.0\BlazorDebugProxy\Microsoft.CodeAnalysis.CSharp.Scripting.dll
+E:\BYU\code\Next.js\movie box rama\MovieBox-Cooments\MovieBox-Comments\bin\Debug\net8.0\BlazorDebugProxy\Microsoft.CodeAnalysis.dll
+E:\BYU\code\Next.js\movie box rama\MovieBox-Cooments\MovieBox-Comments\bin\Debug\net8.0\BlazorDebugProxy\Microsoft.CodeAnalysis.Scripting.dll
+E:\BYU\code\Next.js\movie box rama\MovieBox-Cooments\MovieBox-Comments\bin\Debug\net8.0\BlazorDebugProxy\Microsoft.FileFormats.dll
+E:\BYU\code\Next.js\movie box rama\MovieBox-Cooments\MovieBox-Comments\bin\Debug\net8.0\BlazorDebugProxy\Microsoft.NET.WebAssembly.Webcil.dll
+E:\BYU\code\Next.js\movie box rama\MovieBox-Cooments\MovieBox-Comments\bin\Debug\net8.0\BlazorDebugProxy\Microsoft.SymbolStore.dll
+E:\BYU\code\Next.js\movie box rama\MovieBox-Cooments\MovieBox-Comments\bin\Debug\net8.0\BlazorDebugProxy\Newtonsoft.Json.dll
 E:\BYU\code\Next.js\movie box rama\MovieBox-Cooments\MovieBox-Comments\bin\Debug\net8.0\MovieBox.staticwebassets.runtime.json
 E:\BYU\code\Next.js\movie box rama\MovieBox-Cooments\MovieBox-Comments\bin\Debug\net8.0\MovieBox.staticwebassets.endpoints.json
 E:\BYU\code\Next.js\movie box rama\MovieBox-Cooments\MovieBox-Comments\bin\Debug\net8.0\MovieBox.exe
@@ -9,6 +20,7 @@ E:\BYU\code\Next.js\movie box rama\MovieBox-Cooments\MovieBox-Comments\bin\Debug
 E:\BYU\code\Next.js\movie box rama\MovieBox-Cooments\MovieBox-Comments\bin\Debug\net8.0\MovieBox.dll
 E:\BYU\code\Next.js\movie box rama\MovieBox-Cooments\MovieBox-Comments\bin\Debug\net8.0\MovieBox.pdb
 E:\BYU\code\Next.js\movie box rama\MovieBox-Cooments\MovieBox-Comments\bin\Debug\net8.0\Humanizer.dll
+E:\BYU\code\Next.js\movie box rama\MovieBox-Cooments\MovieBox-Comments\bin\Debug\net8.0\Microsoft.AspNetCore.Components.WebAssembly.Server.dll
 E:\BYU\code\Next.js\movie box rama\MovieBox-Cooments\MovieBox-Comments\bin\Debug\net8.0\Microsoft.Bcl.AsyncInterfaces.dll
 E:\BYU\code\Next.js\movie box rama\MovieBox-Cooments\MovieBox-Comments\bin\Debug\net8.0\Microsoft.CodeAnalysis.dll
 E:\BYU\code\Next.js\movie box rama\MovieBox-Cooments\MovieBox-Comments\bin\Debug\net8.0\Microsoft.CodeAnalysis.CSharp.dll
@@ -132,6 +144,17 @@ E:\BYU\code\Next.js\movie box rama\MovieBox-Cooments\MovieBox-Comments\obj\Debug
 E:\BYU\code\Next.js\MovieBox\bin\Debug\net8.0\appsettings.Development.json
 E:\BYU\code\Next.js\MovieBox\bin\Debug\net8.0\appsettings.json
 E:\BYU\code\Next.js\MovieBox\bin\Debug\net8.0\rewrites.json
+E:\BYU\code\Next.js\MovieBox\bin\Debug\net8.0\BlazorDebugProxy\BrowserDebugHost.dll
+E:\BYU\code\Next.js\MovieBox\bin\Debug\net8.0\BlazorDebugProxy\BrowserDebugHost.runtimeconfig.json
+E:\BYU\code\Next.js\MovieBox\bin\Debug\net8.0\BlazorDebugProxy\BrowserDebugProxy.dll
+E:\BYU\code\Next.js\MovieBox\bin\Debug\net8.0\BlazorDebugProxy\Microsoft.CodeAnalysis.CSharp.dll
+E:\BYU\code\Next.js\MovieBox\bin\Debug\net8.0\BlazorDebugProxy\Microsoft.CodeAnalysis.CSharp.Scripting.dll
+E:\BYU\code\Next.js\MovieBox\bin\Debug\net8.0\BlazorDebugProxy\Microsoft.CodeAnalysis.dll
+E:\BYU\code\Next.js\MovieBox\bin\Debug\net8.0\BlazorDebugProxy\Microsoft.CodeAnalysis.Scripting.dll
+E:\BYU\code\Next.js\MovieBox\bin\Debug\net8.0\BlazorDebugProxy\Microsoft.FileFormats.dll
+E:\BYU\code\Next.js\MovieBox\bin\Debug\net8.0\BlazorDebugProxy\Microsoft.NET.WebAssembly.Webcil.dll
+E:\BYU\code\Next.js\MovieBox\bin\Debug\net8.0\BlazorDebugProxy\Microsoft.SymbolStore.dll
+E:\BYU\code\Next.js\MovieBox\bin\Debug\net8.0\BlazorDebugProxy\Newtonsoft.Json.dll
 E:\BYU\code\Next.js\MovieBox\bin\Debug\net8.0\MovieBox.staticwebassets.runtime.json
 E:\BYU\code\Next.js\MovieBox\bin\Debug\net8.0\MovieBox.staticwebassets.endpoints.json
 E:\BYU\code\Next.js\MovieBox\bin\Debug\net8.0\MovieBox.exe
@@ -140,6 +163,7 @@ E:\BYU\code\Next.js\MovieBox\bin\Debug\net8.0\MovieBox.runtimeconfig.json
 E:\BYU\code\Next.js\MovieBox\bin\Debug\net8.0\MovieBox.dll
 E:\BYU\code\Next.js\MovieBox\bin\Debug\net8.0\MovieBox.pdb
 E:\BYU\code\Next.js\MovieBox\bin\Debug\net8.0\Humanizer.dll
+E:\BYU\code\Next.js\MovieBox\bin\Debug\net8.0\Microsoft.AspNetCore.Components.WebAssembly.Server.dll
 E:\BYU\code\Next.js\MovieBox\bin\Debug\net8.0\Microsoft.Bcl.AsyncInterfaces.dll
 E:\BYU\code\Next.js\MovieBox\bin\Debug\net8.0\Microsoft.CodeAnalysis.dll
 E:\BYU\code\Next.js\MovieBox\bin\Debug\net8.0\Microsoft.CodeAnalysis.CSharp.dll

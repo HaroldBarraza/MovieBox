@@ -2,8 +2,6 @@
 @rendermode InteractiveServer
 @using MovieBox.Models
 @using MovieBox.Services
-@using Microsoft.AspNetCore.Components.Forms
-@using Microsoft.AspNetCore.Components.Authorization
 @inject MovieService MovieService
 @inject CommentService CommentService
 @inject NavigationManager Navigation
@@ -182,14 +180,12 @@ else
                                                             </span>
                                                         }
                                                     </div>
-                                                    <!-- CORREGIDO: @bind en lugar de @bind-Value -->
                                                     <InputNumber id="ratingInput" 
                                                                 @bind-Value="newComment.Rating" 
                                                                 class="form-control rating-input-number d-none"
                                                                 min="1" 
                                                                 max="5" 
-                                                                step="1" 
-                                                                TValue="int" />
+                                                                step="1" />
                                                     <div class="rating-input-help">
                                                         <small class="text-muted">Haz clic en las estrellas o escribe un número del 1 al 5</small>
                                                     </div>
@@ -207,7 +203,6 @@ else
 
                                         <div class="mb-3">
                                             <label for="commentText" class="form-label fw-bold">Comentario</label>
-                                            <!-- CORREGIDO: @bind en lugar de @bind-Value -->
                                             <InputTextArea id="commentText" @bind-Value="newComment.Text" 
                                                          class="form-control" rows="4" 
                                                          placeholder="Escribe tu comentario aquí... ¿Qué te pareció la película?" />
@@ -215,7 +210,8 @@ else
                                             <small class="text-muted">Máximo 500 caracteres</small>
                                         </div>
 
-                                        <button type="submit" class="btn btn-primary" disabled="@isSubmitting">
+                                        <!-- BOTÓN TEMPORAL PARA TESTING -->
+                                        <button type="button" class="btn btn-primary" @onclick="AddComment" disabled="@isSubmitting">
                                             @if (isSubmitting)
                                             {
                                                 <span class="spinner-border spinner-border-sm" role="status"></span>
@@ -226,6 +222,19 @@ else
                                                 <span>Publicar Comentario</span>
                                             }
                                         </button>
+
+                                        <!-- BOTÓN ORIGINAL (COMENTADO TEMPORALMENTE) -->
+                                        @* <button type="submit" class="btn btn-primary" disabled="@isSubmitting">
+                                            @if (isSubmitting)
+                                            {
+                                                <span class="spinner-border spinner-border-sm" role="status"></span>
+                                                <span> Enviando...</span>
+                                            }
+                                            else
+                                            {
+                                                <span>Publicar Comentario</span>
+                                            }
+                                        </button> *@
                                     </EditForm>
                                 </div>
                             </div>
@@ -372,49 +381,101 @@ else
 
     private async Task AddComment()
     {
+        Console.WriteLine("=== INICIANDO ADDCOMMENT ===");
         isSubmitting = true;
         StateHasChanged();
         
         try
         {
+            Console.WriteLine("✅ AddComment method called");
+            
+            // Verificar datos del comentario
+            Console.WriteLine($"📝 Comment Data - Rating: {newComment.Rating}, Text: {newComment.Text}");
+            
             if (newComment.Rating < 1 || newComment.Rating > 5)
             {
+                Console.WriteLine("❌ Rating validation failed");
                 await JS.InvokeVoidAsync("alert", "La calificación debe ser entre 1 y 5");
                 return;
             }
 
             if (string.IsNullOrWhiteSpace(newComment.Text))
             {
+                Console.WriteLine("❌ Text validation failed");
                 await JS.InvokeVoidAsync("alert", "El comentario no puede estar vacío");
                 return;
             }
 
-            // Obtener nombre del usuario automáticamente
+            // Verificar autenticación
             var authState = await AuthStateProvider.GetAuthenticationStateAsync();
+            Console.WriteLine($"🔐 Auth State - IsAuthenticated: {authState.User.Identity?.IsAuthenticated}");
+            Console.WriteLine($"👤 User Name: {authState.User.Identity?.Name}");
+            
+            if (!authState.User.Identity.IsAuthenticated)
+            {
+                Console.WriteLine("❌ User not authenticated");
+                await JS.InvokeVoidAsync("alert", "Debes iniciar sesión para comentar");
+                return;
+            }
+
             var userName = authState.User.Identity?.Name ?? "Usuario Anónimo";
             
-            newComment.UserName = userName;
-            newComment.MovieId = Id;
+            Console.WriteLine($"🎯 Creating comment for user: {userName}");
             
-            await CommentService.CreateCommentAsync(newComment);
-            
+            // Preparar el comentario
+            var commentToCreate = new Comment
+            {
+                UserName = userName,
+                Rating = newComment.Rating,
+                Text = newComment.Text,
+                MovieId = Id,
+                CreatedAt = DateTime.UtcNow
+            };
+
+            // Intentar crear comentario
+            Console.WriteLine("💾 Attempting to save comment to database...");
+            try
+            {
+                await CommentService.CreateCommentAsync(commentToCreate);
+                Console.WriteLine("✅ Comment saved successfully");
+            }
+            catch (Exception dbEx)
+            {
+                Console.WriteLine($"❌ Database error: {dbEx.Message}");
+                Console.WriteLine($"📋 StackTrace: {dbEx.StackTrace}");
+                await JS.InvokeVoidAsync("alert", $"Error de base de datos: {dbEx.Message}");
+                return;
+            }
+
             // Limpiar formulario
             newComment = new Comment();
+            Console.WriteLine("🧹 Form cleared");
             
             // Recargar datos
+            Console.WriteLine("🔄 Reloading comments and ratings...");
             await LoadComments();
             await LoadAverageRating();
+            Console.WriteLine("✅ Data reloaded");
             
-            await JS.InvokeVoidAsync("alert", "Comentario agregado exitosamente");
+            await JS.InvokeVoidAsync("alert", "✅ Comentario agregado exitosamente");
+            Console.WriteLine("🎉 Comment process completed successfully");
+            
         }
         catch (Exception ex)
         {
-            await JS.InvokeVoidAsync("alert", $"Error al agregar comentario: {ex.Message}");
+            Console.WriteLine($"💥 ERROR CRÍTICO en AddComment: {ex.Message}");
+            Console.WriteLine($"📋 StackTrace: {ex.StackTrace}");
+            if (ex.InnerException != null)
+            {
+                Console.WriteLine($"🔍 Inner Exception: {ex.InnerException.Message}");
+            }
+            await JS.InvokeVoidAsync("alert", $"❌ Error al agregar comentario: {ex.Message}");
         }
         finally
         {
             isSubmitting = false;
             StateHasChanged();
+            Console.WriteLine("=== FINALIZANDO ADDCOMMENT ===");
         }
     }
 

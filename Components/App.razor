@@ -3,37 +3,61 @@
 @using Microsoft.AspNetCore.Components.Web
 @using MovieBox.Components.Layout
 
-<CascadingAuthenticationState>
-    <Router AppAssembly="@typeof(Program).Assembly">
-        <Found Context="routeData">
-            <AuthorizeRouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)">
-                <NotAuthorized>
-                    <div class="container mt-5">
-                        <div class="alert alert-warning text-center">
-                            <h4>Access Denied</h4>
-                            <p>You are not authorized to view this page.</p>
-                            <a href="/signin" class="btn btn-primary">Sign In</a>
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <base href="/" />
+    <link rel="stylesheet" href="lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="app.css" />
+    <link rel="stylesheet" href="MovieBox.styles.css" />
+    <link rel="icon" type="image/png" href="favicon.png" />
+    <HeadOutlet />
+</head>
+
+<body>
+    <CascadingAuthenticationState>
+        <Router AppAssembly="@typeof(Program).Assembly">
+            <Found Context="routeData">
+                <AuthorizeRouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)">
+                    <NotAuthorized>
+                        <div class="container mt-5">
+                            <div class="alert alert-warning text-center">
+                                <h4>Access Denied</h4>
+                                <p>You are not authorized to view this page.</p>
+                                <a href="/signin" class="btn btn-primary">Sign In</a>
+                            </div>
                         </div>
-                    </div>
-                </NotAuthorized>
-                <Authorizing>
-                    <div class="container mt-5 text-center">
-                        <div class="spinner-border" role="status">
-                            <span class="visually-hidden">Loading...</span>
+                    </NotAuthorized>
+                    <Authorizing>
+                        <div class="container mt-5 text-center">
+                            <div class="spinner-border" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                            <p class="mt-2">Authorizing...</p>
                         </div>
-                        <p class="mt-2">Authorizing...</p>
-                    </div>
-                </Authorizing>
-            </AuthorizeRouteView>
-            <FocusOnNavigate RouteData="@routeData" Selector="h1" />
-        </Found>
-        <NotFound>
-            <LayoutView Layout="@typeof(MainLayout)">
-                <div class="container mt-5 text-center">
-                    <h1>Page Not Found</h1>
-                    <p>Sorry, there's nothing at this address.</p>
-                </div>
-            </LayoutView>
-        </NotFound>
-    </Router>
-</CascadingAuthenticationState>
+                    </Authorizing>
+                </AuthorizeRouteView>
+                <FocusOnNavigate RouteData="@routeData" Selector="h1" />
+            </Found>
+            <NotFound>
+                <PageTitle>Not found</PageTitle>
+                <LayoutView Layout="@typeof(MainLayout)">
+                    <p role="alert">Sorry, there's nothing at this address.</p>
+                </LayoutView>
+            </NotFound>
+        </Router>
+    </CascadingAuthenticationState>
+
+    <div id="blazor-error-ui">
+        An unhandled error has occurred.
+        <a href="" class="reload">Reload</a>
+        <a class="dismiss">🗙</a>
+    </div>
+
+    <script src="_framework/blazor.web.js"></script>
+</body>
+
+</html>
