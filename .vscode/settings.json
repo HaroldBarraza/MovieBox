@@ -1,16 +1,3 @@
 {
-    "dotnet.defaultSolution": "MovieBox.sln",
-    "sqltools.connections": [
-        {
-            "ssh": "Disabled",
-            "previewLimit": 50,
-            "server": "maglev.proxy.rlwy.net",
-            "port": 31543,
-            "driver": "PostgreSQL",
-            "name": "railwau",
-            "database": "railway",
-            "username": "postgres",
-            "password": "RZoFDldrPfTiaSwKojxDeTXADUWRSUNE"
-        }
-    ]
+    "dotnet.defaultSolution": "MovieBox.sln"
 }
