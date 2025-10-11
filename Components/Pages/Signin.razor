@@ -10,58 +10,71 @@
 @inject AuthenticationStateProvider AuthStateProvider
 @inject IJSRuntime JS
 
-<div class="container mt-5">
-    <div class="row justify-content-center">
-        <div class="col-md-6">
-            <div class="card shadow">
-                <div class="card-header bg-primary text-white">
-                    <h4 class="mb-0">Sign In</h4>
+<div class="signin-container">
+    <div class="signin-background">
+        <div class="background-overlay"></div>
+    </div>
+    
+    <div class="signin-content">
+        <div class="signin-card">
+            <!-- Header -->
+            <div class="signin-header">
+                <div class="logo">
+                    <h1>MovieBox</h1>
                 </div>
-                <div class="card-body">
-                    <EditForm Model="@signinModel" OnValidSubmit="HandleValidSubmit" FormName="SigninForm">
-                        <DataAnnotationsValidator />
-                        
-                        @if (!string.IsNullOrEmpty(signinError))
-                        {
-                            <div class="alert alert-danger">@signinError</div>
-                        }
-                        
-                        <div class="mb-3">
-                            <label for="email" class="form-label">Email</label>
-                            <InputText id="email" placeholder="Enter your email" 
-                                      class="form-control" Name="Email"
-                                      @bind-Value="signinModel.Email" />
-                            <ValidationMessage For="() => signinModel.Email" />
-                        </div>
+                <h2>Welcome Back</h2>
+                <p>Sign in to your account to continue</p>
+            </div>
 
-                        <div class="mb-3">
-                            <label for="password" class="form-label">Password</label>
-                            <InputText id="password" type="password"
-                                      placeholder="Enter your password" 
-                                      class="form-control" Name="Password"
-                                      @bind-Value="signinModel.Password" />
-                            <ValidationMessage For="() => signinModel.Password" />
-                        </div>
-
-                        <button type="submit" class="btn btn-primary w-100" disabled="@isLoading">
-                            @if (isLoading)
-                            {
-                                <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-                                <span class="ms-2">Signing in...</span>
-                            }
-                            else
-                            {
-                                <span>Sign In</span>
-                            }
-                        </button>
-                    </EditForm>
+            <!-- Form -->
+            <div class="signin-form">
+                <EditForm Model="@signinModel" OnValidSubmit="HandleValidSubmit" FormName="SigninForm">
+                    <DataAnnotationsValidator />
                     
-                    <div class="text-center mt-3">
-                        <small class="text-muted">
-                            Don't have an account? 
-                            <a href="/register" class="text-decoration-none">Register here</a>
-                        </small>
+                    @if (!string.IsNullOrEmpty(signinError))
+                    {
+                        <div class="error-message">
+                            <span class="error-icon">⚠️</span>
+                            @signinError
+                        </div>
+                    }
+                    
+                    <div class="form-group">
+                        <label for="email" class="form-label">Email Address</label>
+                        <InputText id="email" placeholder="Enter your email" 
+                                  class="form-input" Name="Email"
+                                  @bind-Value="signinModel.Email" />
+                        <ValidationMessage For="() => signinModel.Email" />
                     </div>
+
+                    <div class="form-group">
+                        <label for="password" class="form-label">Password</label>
+                        <InputText id="password" type="password"
+                                  placeholder="Enter your password" 
+                                  class="form-input" Name="Password"
+                                  @bind-Value="signinModel.Password" />
+                        <ValidationMessage For="() => signinModel.Password" />
+                    </div>
+
+                    <button type="submit" class="signin-btn" disabled="@isLoading">
+                        @if (isLoading)
+                        {
+                            <span class="spinner"></span>
+                            <span>Signing in...</span>
+                        }
+                        else
+                        {
+                            <span class="btn-icon">🎬</span>
+                            <span>Sign In</span>
+                        }
+                    </button>
+                </EditForm>
+                
+                <div class="signin-footer">
+                    <span class="footer-text">
+                        Don't have an account? 
+                        <a href="/register" class="register-link">Create one here</a>
+                    </span>
                 </div>
             </div>
         </div>
@@ -94,7 +107,6 @@
                     Role = userAccount.Role
                 };
                 
-                // 🔥 ACTUALIZAR ESTADO DE AUTENTICACIÓN
                 await customAuthStateProvider.UpdateAuthenticationState(userSession);
                 
                 Console.WriteLine($"=== LOGIN SUCCESSFUL ===");
@@ -103,14 +115,13 @@
                 Console.WriteLine($"Role: {userAccount.Role}");
                 Console.WriteLine($"=== END LOGIN ===");
 
-                // 🔥 FORZAR NAVEGACIÓN COMPLETA
                 NavigationManager.NavigateTo("/", true);
             }
         }
         catch (Exception ex)
         {
             Console.WriteLine($"Sign in error: {ex}");
-            signinError = "Invalid email or password.";
+            signinError = "Invalid email or password. Please try again.";
             isLoading = false;
             StateHasChanged();
         }

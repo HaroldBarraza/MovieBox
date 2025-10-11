@@ -399,5 +399,10 @@ E:\BYU\code\Next.js\MovieBox\obj\Debug\net9.0\compressed\6lz2rjt40m-notf2xhcfb.g
 E:\BYU\code\Next.js\MovieBox\obj\Debug\net9.0\compressed\19s3xrf2gu-h1s4sie4z3.gz
 E:\BYU\code\Next.js\MovieBox\obj\Debug\net9.0\compressed\mryqqk4dhf-63fj8s7r0e.gz
 E:\BYU\code\Next.js\MovieBox\obj\Debug\net9.0\compressed\sl2lcgwxre-0j3bgjxly4.gz
-E:\BYU\code\Next.js\MovieBox\obj\Debug\net9.0\compressed\z9s6zk0po6-8cdipgkof6.gz
-E:\BYU\code\Next.js\MovieBox\obj\Debug\net9.0\compressed\ies0hh0p4b-8cdipgkof6.gz
+E:\BYU\code\Next.js\MovieBox\obj\Debug\net9.0\scopedcss\Components\Pages\Signin.razor.rz.scp.css
+E:\BYU\code\Next.js\MovieBox\obj\Debug\net9.0\scopedcss\Components\Pages\MoviesCRUD.razor.rz.scp.css
+E:\BYU\code\Next.js\MovieBox\obj\Debug\net9.0\scopedcss\Components\Pages\Movies.razor.rz.scp.css
+E:\BYU\code\Next.js\MovieBox\obj\Debug\net9.0\scopedcss\Components\Pages\EditMovie.razor.rz.scp.css
+E:\BYU\code\Next.js\MovieBox\obj\Debug\net9.0\scopedcss\Components\Pages\Register.razor.rz.scp.css
+E:\BYU\code\Next.js\MovieBox\obj\Debug\net9.0\compressed\z9s6zk0po6-3oni8p3lwy.gz
+E:\BYU\code\Next.js\MovieBox\obj\Debug\net9.0\compressed\ies0hh0p4b-3oni8p3lwy.gz

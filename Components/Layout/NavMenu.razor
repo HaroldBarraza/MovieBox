@@ -1,64 +1,58 @@
-﻿@using Microsoft.AspNetCore.Components.Authorization
-
-<div class="top-row ps-3 navbar navbar-dark">
-    <div class="container-fluid">
-        <a class="navbar-brand" href="">MovieBox</a>
-        <AuthorizeView>
-            <Authorized>
-                <span class="navbar-text ms-3">
-                    Welcome, @context.User.Identity?.Name!
-                </span>
-            </Authorized>
-        </AuthorizeView>
+﻿<nav class="navbar">
+    <div class="logo">
+        <h1>MovieBox</h1>
     </div>
-</div>
-
-<input type="checkbox" title="Navigation menu" class="navbar-toggler" />
-
-<div class="nav-scrollable" onclick="document.querySelector('.navbar-toggler').click()">
-    <nav class="nav flex-column">
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
-                <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span> Home
-            </NavLink>
-        </div>
-
-        <!-- 🔥 ENLACE PÚBLICO PARA PELÍCULAS -->
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="movies">
-                <span class="bi bi-film" aria-hidden="true"></span> Películas
-            </NavLink>
-        </div>
-
+    
+    <div class="nav-section">
+        <h2>Películas</h2>
+        <ul class="nav-links">
+            <li>
+                <NavLink href="/movies" class="nav-link" style="color: white !important;" Match="NavLinkMatch.All">
+                    <span class="nav-icon">🎬</span> Inicio
+                </NavLink>
+            </li>
+        </ul>
+    </div>
+    
+    
+    <div class="login-section">
         <AuthorizeView>
             <Authorized>
-                <!-- Enlaces que solo ven usuarios autenticados -->
-                <div class="nav-item px-3">
-                    <NavLink class="nav-link" href="counter">
-                        <span class="bi bi-plus-square-fill-nav-menu" aria-hidden="true"></span> Counter
-                    </NavLink>
+                <div class="user-info">
+                    <div class="user-avatar">
+                        <span class="user-icon">👤</span>
+                    </div>
+                    <div class="user-details">
+                        <div class="user-name">@context.User.Identity?.Name</div>
+                        <div class="user-status">Online</div>
+                    </div>
                 </div>
-
-                <div class="nav-item px-3">
-                    <NavLink class="nav-link" href="weather">
-                        <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Weather
-                    </NavLink>
-                </div>
+                <a href="javascript:void(0)" @onclick="Logout" class="logout-btn">
+                    <span class="nav-icon">🚪</span> Cerrar Sesión
+                </a>
             </Authorized>
             <NotAuthorized>
-                <!-- Enlaces que solo ven usuarios NO autenticados -->
-                <div class="nav-item px-3">
-                    <NavLink class="nav-link" href="signin">
-                        <span class="bi bi-box-arrow-in-right" aria-hidden="true"></span> Login
-                    </NavLink>
-                </div>
-                
-                <div class="nav-item px-3">
-                    <NavLink class="nav-link" href="register">
-                        <span class="bi bi-person-plus" aria-hidden="true"></span> Register
-                    </NavLink>
+                <a href="/signin" class="login-btn">
+                    <span class="nav-icon">🔑</span> Iniciar Sesión
+                </a>
+                <div class="register-prompt">
+                    <small>¿No tienes cuenta?</small>
+                    <a href="/register" class="register-link">Regístrate</a>
                 </div>
             </NotAuthorized>
         </AuthorizeView>
-    </nav>
-</div>
+    </div>
+</nav>
+
+@code {
+    [CascadingParameter]
+    private Task<AuthenticationState>? AuthenticationStateTask { get; set; }
+    
+    [Inject]
+    private NavigationManager NavigationManager { get; set; } = default!;
+
+    private async Task Logout()
+    {
+        NavigationManager.NavigateTo("/", true);
+    }
+}

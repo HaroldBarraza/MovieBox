@@ -6,135 +6,188 @@
 @inject NavigationManager Navigation
 @inject IJSRuntime JS
 
-<PageTitle>Editar @(movie?.Title ?? "Película")</PageTitle>
+<PageTitle>Edit @(movie?.Title ?? "Movie")</PageTitle>
 
 @if (movie == null)
 {
-    <div class="container mt-4">
-        <div class="text-center">
+    <div class="edit-movie-container">
+        <div class="loading-container">
             <div class="spinner-border" role="status">
-                <span class="visually-hidden">Cargando...</span>
+                <span class="visually-hidden">Loading...</span>
             </div>
-            <p class="mt-2">Cargando película...</p>
+            <p>Loading movie...</p>
         </div>
     </div>
 }
 else
 {
-    <div class="container mt-4">
+    <div class="edit-movie-container">
         <!-- Header -->
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <h3>Editar Película</h3>
-            <button class="btn btn-outline-secondary" @onclick="GoBack">
-                <span class="oi oi-arrow-left"></span> Volver
+        <div class="edit-header">
+            <div class="header-content">
+                <h1>Edit Movie</h1>
+                <p class="subtitle">Modify information for <strong>@movie.Title</strong></p>
+            </div>
+            <button class="back-button" @onclick="GoBack">
+                <span>←</span> Back to Details
             </button>
         </div>
 
         <AuthorizeView>
             <Authorized>
-                <div class="row">
-                    <div class="col-lg-8 mx-auto">
-                        <div class="card">
-                            <div class="card-body">
-                                <form @onsubmit="HandleSubmit" @onreset="HandleReset">
-                                    <div class="row">
-                                        <!-- Columna de información de solo lectura -->
-                                        <div class="col-md-6">
-                                            <div class="movie-info-readonly">
-                                                <div class="mb-3">
-                                                    <label class="form-label text-muted">Género</label>
-                                                    <div class="form-control-plaintext">
-                                                        @if (!string.IsNullOrEmpty(movie.Genre))
-                                                        {
-                                                            <span>@movie.Genre</span>
-                                                        }
-                                                        else
-                                                        {
-                                                            <span class="text-muted">No especificado</span>
-                                                        }
-                                                    </div>
-                                                </div>
-                                            </div>
+                <div class="edit-form-wrapper">
+                    <div class="edit-form-card">
+                        <div class="form-content">
+                            <div class="movie-preview-section">
+                                <div class="poster-preview-large">
+                                    @if (!string.IsNullOrEmpty(movie.Poster) && movie.Poster != "N/A")
+                                    {
+                                        <img src="@movie.Poster" 
+                                             alt="Poster preview" 
+                                             class="poster-preview-img" />
+                                    }
+                                    else
+                                    {
+                                        <div class="poster-placeholder-large">
+                                            <span>🎬</span>
+                                            <small>No poster</small>
                                         </div>
-
-                                        <div class="col-md-6">
-                                            <div class="mb-3 text-center">
-                                                <label class="form-label text-muted">Póster</label>
-                                                @if (!string.IsNullOrEmpty(movie.Poster) && movie.Poster != "N/A")
-                                                {
-                                                    <div class="poster-preview">
-                                                        <img src="@movie.Poster" 
-                                                             alt="Poster preview" 
-                                                             class="img-thumbnail poster-preview-img" />
-                                                    </div>
-                                                }
-                                                else
-                                                {
-                                                    <div class="poster-preview placeholder">
-                                                        <span class="oi oi-image"></span>
-                                                        <small class="d-block mt-2">Sin póster</small>
-                                                    </div>
-                                                }
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div class="row">
-                                        <div class="col-12">
-                                            <div class="editable-fields">
-                                                <div class="mb-3">
-                                                    <label class="form-label fw-bold">Título *</label>
-                                                    <input type="text" 
-                                                           class="form-control" 
-                                                           @bind="movie.Title"
-                                                           placeholder="Ingresa el título de la película..." />
-                                                    @if (showTitleError)
+                                    }
+                                </div>
+                                
+                                <div class="movie-info-readonly">
+                                    <div class="info-item">
+                                        <label class="info-label">Genre</label>
+                                        <div class="info-value">
+                                            @if (!string.IsNullOrEmpty(movie.Genre))
+                                            {
+                                                <div class="genre-tags">
+                                                    @foreach (var genre in movie.Genre.Split(','))
                                                     {
-                                                        <small class="text-danger">El título es requerido</small>
+                                                        <span class="genre-tag">@genre.Trim()</span>
                                                     }
                                                 </div>
-                                                <div class="mb-3">
-                                                    <label class="form-label fw-bold">Trama (Plot)</label>
-                                                    <textarea class="form-control" 
-                                                              rows="6" 
-                                                              @bind="movie.Plot"
-                                                              placeholder="Trama completa de la película..."></textarea>
-                                                    <small class="text-muted">Describe la trama completa de la película.</small>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div class="d-flex gap-2 justify-content-end mt-4">
-                                        <button type="reset" class="btn btn-outline-secondary">
-                                            <span class="oi oi-reload"></span> Restablecer
-                                        </button>
-                                        <button type="button" class="btn btn-outline-danger" @onclick="DeleteMovie">
-                                            <span class="oi oi-trash"></span> Eliminar
-                                        </button>
-                                        <button type="submit" class="btn btn-primary" disabled="@isSaving">
-                                            @if (isSaving)
-                                            {
-                                                <span class="spinner-border spinner-border-sm" role="status"></span>
                                             }
                                             else
                                             {
-                                                <span class="oi oi-check"></span>
+                                                <span class="no-info">Not specified</span>
                                             }
-                                            Guardar Cambios
-                                        </button>
+                                        </div>
                                     </div>
-                                </form>
+                                    
+                                    <div class="info-item">
+                                        <label class="info-label">Status</label>
+                                        <div class="info-value">
+                                            <span class="status-badge">Being edited</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="editable-fields-section">
+                                <div class="form-section">
+                                    <h3>Editable Information</h3>
+                                    
+                                    <div class="form-group">
+                                        <label class="form-label">
+                                            Movie Title
+                                            <span class="required-star">*</span>
+                                        </label>
+                                        <input type="text" 
+                                               class="form-input @(showTitleError ? "error" : "")" 
+                                               @bind="movie.Title"
+                                               placeholder="Enter movie title..." />
+                                        @if (showTitleError)
+                                        {
+                                            <div class="error-message">
+                                                <span class="error-icon">⚠️</span>
+                                                Title is required
+                                            </div>
+                                        }
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="form-label">Short Description</label>
+                                        <textarea class="form-textarea" 
+                                                  rows="3" 
+                                                  @bind="movie.Description"
+                                                  placeholder="Brief movie description..."></textarea>
+                                        <div class="field-help">
+                                            This description will be shown on movie cards
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="form-label">Full Plot</label>
+                                        <textarea class="form-textarea large" 
+                                                  rows="8" 
+                                                  @bind="movie.Plot"
+                                                  placeholder="Complete movie plot..."></textarea>
+                                        <div class="field-help">
+                                            Describe the complete movie story with details
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="form-label">Poster URL</label>
+                                        <input type="url" 
+                                               class="form-input" 
+                                               @bind="movie.Poster"
+                                               placeholder="https://example.com/poster.jpg" />
+                                        <div class="field-help">
+                                            Link to poster image. Leave empty if no poster available.
+                                        </div>
+                                        
+                                        @if (!string.IsNullOrEmpty(movie.Poster) && movie.Poster.StartsWith("http"))
+                                        {
+                                            <div class="url-preview">
+                                                <small>Preview available</small>
+                                            </div>
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-actions">
+                            <div class="actions-left">
+                                <button type="button" class="btn-delete-danger" @onclick="DeleteMovie">
+                                    <span class="btn-icon">🗑️</span>
+                                    Delete Movie
+                                </button>
+                            </div>
+                            <div class="actions-right">
+                                <button type="button" class="btn-cancel" @onclick="GoBack">
+                                    Cancel
+                                </button>
+                                <button type="button" class="btn-save" @onclick="HandleSubmit" disabled="@isSaving">
+                                    @if (isSaving)
+                                    {
+                                        <span class="spinner-small"></span>
+                                        <span>Saving...</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="btn-icon">💾</span>
+                                        <span>Save Changes</span>
+                                    }
+                                </button>
                             </div>
                         </div>
                     </div>
                 </div>
             </Authorized>
             <NotAuthorized>
-                <div class="alert alert-warning text-center">
-                    <h4>Acceso Requerido</h4>
-                    <p>Necesitas iniciar sesión para editar películas.</p>
-                    <a href="/signin" class="btn btn-primary">Iniciar Sesión</a>
+                <div class="access-denied">
+                    <div class="denied-content">
+                        <div class="denied-icon">🔒</div>
+                        <h2>Access Required</h2>
+                        <p>You need to sign in to edit movies in MovieBox</p>
+                        <a href="/signin" class="btn-login">
+                            <span class="btn-icon">🔑</span>
+                            Sign In
+                        </a>
+                    </div>
                 </div>
             </NotAuthorized>
         </AuthorizeView>
@@ -146,7 +199,6 @@ else
     public int Id { get; set; }
 
     private Movie? movie;
-    private Movie originalMovie = new();
     private bool showTitleError = false;
     private bool isSaving = false;
 
@@ -167,28 +219,16 @@ else
             if (Id > 0)
             {
                 movie = await MovieService.GetMovieAsync(Id);
-                if (movie != null)
+                if (movie == null)
                 {
-                    originalMovie = new Movie
-                    {
-                        Id = movie.Id,
-                        Title = movie.Title,
-                        Description = movie.Description,
-                        Plot = movie.Plot,
-                        Genre = movie.Genre,
-                        Poster = movie.Poster,
-                    };
-                }
-                else
-                {
-                    await JS.InvokeVoidAsync("alert", "No se encontró la película");
+                    await JS.InvokeVoidAsync("alert", "Movie not found");
                     Navigation.NavigateTo("/movies");
                 }
             }
         }
         catch (Exception ex)
         {
-            await JS.InvokeVoidAsync("alert", $"Error al cargar la película: {ex.Message}");
+            await JS.InvokeVoidAsync("alert", $"Error loading movie: {ex.Message}");
             Navigation.NavigateTo("/movies");
         }
     }
@@ -210,29 +250,16 @@ else
         try
         {
             await MovieService.UpdateMovieAsync(movie);
-            await JS.InvokeVoidAsync("alert", "Película actualizada exitosamente");
+            await JS.InvokeVoidAsync("alert", "✅ Movie updated successfully");
             Navigation.NavigateTo($"/movies/{movie.Id}");
         }
         catch (Exception ex)
         {
-            await JS.InvokeVoidAsync("alert", $"Error al guardar: {ex.Message}");
+            await JS.InvokeVoidAsync("alert", $"❌ Error saving: {ex.Message}");
         }
         finally
         {
             isSaving = false;
-            StateHasChanged();
-        }
-    }
-
-    private void HandleReset()
-    {
-        if (movie != null)
-        {
-            movie.Title = originalMovie.Title;
-            movie.Description = originalMovie.Description;
-            movie.Plot = originalMovie.Plot;
-            
-            showTitleError = false;
             StateHasChanged();
         }
     }
@@ -242,7 +269,7 @@ else
         if (movie == null) return;
 
         var confirmed = await JS.InvokeAsync<bool>("confirm", 
-            $"¿Estás seguro de que quieres eliminar \"{movie.Title}\"? Esta acción no se puede deshacer.");
+            $"Are you sure you want to delete \"{movie.Title}\"? This action cannot be undone.");
 
         if (confirmed)
         {
@@ -251,17 +278,17 @@ else
                 var success = await MovieService.DeleteMovieAsync(movie.Id);
                 if (success)
                 {
-                    await JS.InvokeVoidAsync("alert", "Película eliminada exitosamente");
+                    await JS.InvokeVoidAsync("alert", "🗑️ Movie deleted successfully");
                     Navigation.NavigateTo("/movies");
                 }
                 else
                 {
-                    await JS.InvokeVoidAsync("alert", "No se pudo encontrar la película para eliminar");
+                    await JS.InvokeVoidAsync("alert", "Could not find movie to delete");
                 }
             }
             catch (Exception ex)
             {
-                await JS.InvokeVoidAsync("alert", $"Error al eliminar: {ex.Message}");
+                await JS.InvokeVoidAsync("alert", $"❌ Error deleting: {ex.Message}");
             }
         }
     }
@@ -270,4 +297,4 @@ else
     {
         Navigation.NavigateTo($"/movies/{Id}");
     }
-}   
+}

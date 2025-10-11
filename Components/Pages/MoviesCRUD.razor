@@ -9,56 +9,62 @@
 @inject NavigationManager Navigation
 @inject AuthenticationStateProvider AuthStateProvider
 
-<PageTitle>Películas</PageTitle>
+<PageTitle>Movies</PageTitle>
 
+<!-- Debug authentication status -->
 <AuthorizeView Context="debugContext">
     <NotAuthorized>
         <div class="alert alert-warning m-2">
-            <small>DEBUG: Usuario NO autenticado</small>
+            <small>DEBUG: User NOT authenticated</small>
         </div>
     </NotAuthorized>
 </AuthorizeView>
+
 <div class="container mt-4">
+    <!-- Header with title and add movie button -->
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h3>Catálogo de Películas</h3>
+        <h3>Movie Catalog</h3>
         <AuthorizeView>
             <Authorized>
                 <button class="btn btn-primary" @onclick="ShowCreateModal">
-                    <span class="oi oi-plus"></span> Nueva Película
+                    <span class="oi oi-plus"></span> New Movie
                 </button>
             </Authorized>
             <NotAuthorized>
-                <a href="/signin" class="btn btn-outline-primary">Iniciar sesión para agregar películas</a>
+                <a href="/signin" class="btn btn-outline-primary">Sign in to add movies</a>
             </NotAuthorized>
         </AuthorizeView>
     </div>
 
     @if (movies == null)
     {
+        <!-- Loading state -->
         <div class="text-center">
             <div class="spinner-border" role="status">
-                <span class="visually-hidden">Cargando...</span>
+                <span class="visually-hidden">Loading...</span>
             </div>
         </div>
     }
     else if (!movies.Any())
     {
+        <!-- Empty state -->
         <div class="alert alert-info">
-            No hay películas registradas.
+            No movies registered.
         </div>
     }
     else
     {
-        <!-- Grid de películas -->
+        <!-- Movies grid -->
         <div class="row">
             @foreach (var movie in movies)
             {
                 <div class="col-md-6 col-lg-4 mb-4">
                     <div class="card h-100 shadow-sm movie-card">
-                        <!-- Contenedor centrado para la imagen -->
+                        <!-- Centered image container -->
                         <div class="image-container">
                             @if (!string.IsNullOrEmpty(movie.Poster) && movie.Poster != "N/A")
                             {
+                                <!-- Movie poster with fallback -->
                                 <img src="@movie.Poster" 
                                      class="movie-poster-img" 
                                      alt="@movie.Title"
@@ -69,6 +75,7 @@
                             }
                             else
                             {
+                                <!-- Placeholder when no poster available -->
                                 <div class="poster-placeholder">
                                     <span class="oi oi-image"></span>
                                 </div>
@@ -76,10 +83,10 @@
                         </div>
                         
                         <div class="card-body">
-                            <!-- Título debajo de la imagen -->
+                            <!-- Title below image -->
                             <h5 class="movie-title">@movie.Title.ToUpper()</h5>
                             
-                            <!-- Género pequeño -->
+                            <!-- Genre display -->
                             @if (!string.IsNullOrEmpty(movie.Genre))
                             {
                                 <div class="movie-genre-container">
@@ -87,7 +94,7 @@
                                 </div>
                             }
 
-                            <!-- Información de rating y duración -->
+                            <!-- Rating and duration information -->
                             <div class="movie-info">
                                 <div class="movie-rating">
                                     <span class="rating-stars">★★★★★</span>
@@ -96,12 +103,12 @@
                                 <div class="movie-duration">2h 22m</div>
                             </div>
 
-                            <!-- Botón Ver Detalles -->
+                            <!-- View Details button -->
                             <div class="action-buttons">
                                 <button class="btn btn-details w-100" 
                                         @onclick="() => NavigateToDetails(movie.Id)"
-                                        title="Ver detalles de la película">
-                                    <span class="oi oi-eye"></span> Ver Detalles
+                                        title="View movie details">
+                                    <span class="oi oi-eye"></span> View Details
                                 </button>
                             </div>
                         </div>
@@ -112,7 +119,7 @@
     }
 </div>
 
-<!-- Modal para Crear/Editar (solo para usuarios autenticados) -->
+<!-- Create/Edit Modal (only for authenticated users) -->
 <AuthorizeView>
     <Authorized>
         @if (showModal)
@@ -121,34 +128,35 @@
                 <div class="modal-dialog modal-lg">
                     <div class="modal-content">
                         <div class="modal-header">
-                            <h5 class="modal-title">@(currentMovie.Id == 0 ? "Agregar Película" : "Editar Película")</h5>
+                            <h5 class="modal-title">@(currentMovie.Id == 0 ? "Add Movie" : "Edit Movie")</h5>
                             <button type="button" class="btn-close" @onclick="CloseModal"></button>
                         </div>
                         <div class="modal-body">
                             <div class="row">
                                 <div class="col-md-6">
-                                    <!-- Búsqueda y sugerencias -->
+                                    <!-- Search and suggestions -->
                                     <div class="mb-3">
-                                        <label class="form-label">Buscar Película *</label>
+                                        <label class="form-label">Search Movie *</label>
                                         <div class="position-relative">
                                             <input type="text" 
                                                    class="form-control" 
                                                    value="@searchQuery"
                                                    @oninput="HandleSearchInput"
-                                                   placeholder="Escribe el nombre de la película..."
+                                                   placeholder="Type the movie name..."
                                                    disabled="@isLoadingSuggestions" />
                                             
                                             @if (isLoadingSuggestions)
                                             {
+                                                <!-- Loading spinner for search -->
                                                 <div class="position-absolute top-50 end-0 translate-middle-y me-2">
                                                     <div class="spinner-border spinner-border-sm" role="status">
-                                                        <span class="visually-hidden">Buscando...</span>
+                                                        <span class="visually-hidden">Searching...</span>
                                                     </div>
                                                 </div>
                                             }
                                         </div>
 
-                                        <!-- Lista de sugerencias -->
+                                        <!-- Suggestions list -->
                                         @if (suggestions.Any() && !string.IsNullOrWhiteSpace(searchQuery))
                                         {
                                             <div class="suggestions-list mt-2 border rounded">
@@ -160,6 +168,7 @@
                                                         <div class="d-flex align-items-center">
                                                             @if (!string.IsNullOrEmpty(suggestion.Poster) && suggestion.Poster != "N/A")
                                                             {
+                                                                <!-- Suggestion poster -->
                                                                 <img src="@suggestion.Poster" 
                                                                      alt="@suggestion.Title" 
                                                                      style="width: 40px; height: 60px; object-fit: cover;"
@@ -177,42 +186,43 @@
                                         }
                                     </div>
 
-                                    <!-- Campos editables -->
+                                    <!-- Editable fields -->
                                     <div class="mb-3">
-                                        <label class="form-label">Título *</label>
+                                        <label class="form-label">Title *</label>
                                         <input type="text" class="form-control" @bind="currentMovie.Title" />
                                         @if (showTitleError)
                                         {
-                                            <small class="text-danger">El título es requerido</small>
+                                            <small class="text-danger">Title is required</small>
                                         }
                                     </div>
 
                                     <div class="mb-3">
-                                        <label class="form-label">Género</label>
+                                        <label class="form-label">Genre</label>
                                         <input type="text" class="form-control" @bind="currentMovie.Genre" 
-                                               placeholder="Ej: Action, Drama, Comedy" />
+                                               placeholder="Ex: Action, Drama, Comedy" />
                                     </div>
                                 </div>
 
                                 <div class="col-md-6">
                                     <div class="mb-3">
-                                        <label class="form-label">Descripción</label>
+                                        <label class="form-label">Description</label>
                                         <textarea class="form-control" rows="3" @bind="currentMovie.Description"
-                                                  placeholder="Breve descripción..."></textarea>
+                                                  placeholder="Brief description..."></textarea>
                                     </div>
 
                                     <div class="mb-3">
-                                        <label class="form-label">Trama (Plot)</label>
+                                        <label class="form-label">Plot</label>
                                         <textarea class="form-control" rows="4" @bind="currentMovie.Plot"
-                                                  placeholder="Trama completa de la película..."></textarea>
+                                                  placeholder="Complete movie plot..."></textarea>
                                     </div>
 
                                     <div class="mb-3">
-                                        <label class="form-label">URL del Póster</label>
+                                        <label class="form-label">Poster URL</label>
                                         <input type="url" class="form-control" @bind="currentMovie.Poster" 
                                                placeholder="https://example.com/poster.jpg" />
                                         @if (!string.IsNullOrEmpty(currentMovie.Poster) && currentMovie.Poster != "N/A")
                                         {
+                                            <!-- Poster preview -->
                                             <div class="mt-2">
                                                 <img src="@currentMovie.Poster" 
                                                      alt="Poster" 
@@ -225,10 +235,10 @@
                             </div>
                         </div>
                         <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" @onclick="CloseModal">Cancelar</button>
+                            <button type="button" class="btn btn-secondary" @onclick="CloseModal">Cancel</button>
                             <button type="button" class="btn btn-primary" @onclick="SaveMovie" 
                                     disabled="@(string.IsNullOrWhiteSpace(currentMovie.Title))">
-                                @(currentMovie.Id == 0 ? "Crear Película" : "Actualizar Película")
+                                @(currentMovie.Id == 0 ? "Create Movie" : "Update Movie")
                             </button>
                         </div>
                     </div>
@@ -248,11 +258,17 @@
     private bool isLoadingSuggestions = false;
     private System.Threading.CancellationTokenSource? searchCancellationTokenSource;
 
+    /// <summary>
+    /// Initializes component by loading movies
+    /// </summary>
     protected override async Task OnInitializedAsync()
     {
         await LoadMovies();
     }
 
+    /// <summary>
+    /// Loads movies from the service
+    /// </summary>
     private async Task LoadMovies()
     {
         try
@@ -266,16 +282,23 @@
         }
     }
 
+    /// <summary>
+    /// Handles search input with debouncing
+    /// </summary>
     private async void HandleSearchInput(ChangeEventArgs e)
     {
         searchQuery = e.Value?.ToString() ?? "";
         
+        // Cancel previous search
         searchCancellationTokenSource?.Cancel();
         searchCancellationTokenSource = new System.Threading.CancellationTokenSource();
         
         await SearchMoviesDelayed(searchCancellationTokenSource.Token);
     }
 
+    /// <summary>
+    /// Performs delayed search to avoid excessive API calls
+    /// </summary>
     private async Task SearchMoviesDelayed(System.Threading.CancellationToken cancellationToken)
     {
         await Task.Delay(500);
@@ -311,6 +334,9 @@
         }
     }
 
+    /// <summary>
+    /// Selects a movie suggestion and loads its details
+    /// </summary>
     private async Task SelectSuggestion(MovieSuggestion suggestion)
     {
         try
@@ -319,12 +345,14 @@
             
             if (details != null)
             {
+                // Populate form with movie details
                 currentMovie.Title = details.Title;
                 currentMovie.Description = details.Plot.Length > 200 ? details.Plot.Substring(0, 200) + "..." : details.Plot;
                 currentMovie.Plot = details.Plot;
                 currentMovie.Genre = details.Genre?.Split(',').FirstOrDefault()?.Trim() ?? "";
                 currentMovie.Poster = details.Poster != "N/A" ? details.Poster : "";
                 
+                // Clear search state
                 suggestions.Clear();
                 searchQuery = "";
                 StateHasChanged();
@@ -332,15 +360,21 @@
         }
         catch (Exception ex)
         {
-            await JS.InvokeVoidAsync("alert", $"Error al cargar detalles: {ex.Message}");
+            await JS.InvokeVoidAsync("alert", $"Error loading details: {ex.Message}");
         }
     }
 
+    /// <summary>
+    /// Navigates to movie details page
+    /// </summary>
     private void NavigateToDetails(int movieId)
     {
         Navigation.NavigateTo($"/movies/{movieId}");
     }
 
+    /// <summary>
+    /// Shows the create movie modal
+    /// </summary>
     private void ShowCreateModal()
     {
         currentMovie = new Movie();
@@ -351,6 +385,9 @@
         StateHasChanged();
     }
 
+    /// <summary>
+    /// Closes the modal and resets form
+    /// </summary>
     private void CloseModal()
     {
         showModal = false;
@@ -360,6 +397,9 @@
         StateHasChanged();
     }
 
+    /// <summary>
+    /// Saves the movie (create or update)
+    /// </summary>
     private async Task SaveMovie()
     {
         if (string.IsNullOrWhiteSpace(currentMovie.Title))
@@ -374,12 +414,12 @@
             if (currentMovie.Id == 0)
             {
                 await MovieService.CreateMovieAsync(currentMovie);
-                await ShowAlert("Película creada exitosamente");
+                await ShowAlert("Movie created successfully");
             }
             else
             {
                 await MovieService.UpdateMovieAsync(currentMovie);
-                await ShowAlert("Película actualizada exitosamente");
+                await ShowAlert("Movie updated successfully");
             }
 
             showModal = false;
@@ -388,10 +428,13 @@
         }
         catch (Exception ex)
         {
-            await ShowAlert($"Error al guardar: {ex.Message}");
+            await ShowAlert($"Error saving: {ex.Message}");
         }
     }
 
+    /// <summary>
+    /// Shows a JavaScript alert
+    /// </summary>
     private async Task ShowAlert(string message)
     {
         await JS.InvokeVoidAsync("alert", message);

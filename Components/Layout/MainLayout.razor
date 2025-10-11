@@ -1,6 +1,10 @@
 ﻿@inherits LayoutComponentBase
+@using Microsoft.AspNetCore.Components.Authorization
 @inject AuthenticationStateProvider AuthStateProvider
 @inject NavigationManager NavigationManager
+
+<!-- Agregar el CSS específico -->
+<link rel="stylesheet" href="css/mainlayout.css" />
 
 <PageTitle>MovieBox</PageTitle>
 
@@ -10,19 +14,6 @@
     </div>
 
     <main>
-        <div class="top-row px-4">
-            <AuthorizeView Context="layoutContext">
-                <Authorized>
-                    <span class="me-3">Hello, @(layoutContext.User.Identity?.Name ?? "User")!</span>
-                    <a href="javascript:void(0)" @onclick="Logout" class="text-decoration-none">Logout</a>
-                </Authorized>
-                <NotAuthorized>
-                    <a href="/signin" class="text-decoration-none me-3">Login</a>
-                    <a href="/register" class="text-decoration-none">Register</a>
-                </NotAuthorized>
-            </AuthorizeView>
-        </div>
-
         <article class="content px-4">
             @Body
         </article>
@@ -32,8 +23,7 @@
 @code {
     private async Task Logout()
     {
-        var customAuthStateProvider = (CustomAuthenticationStateProvider)AuthStateProvider;
-        await customAuthStateProvider.UpdateAuthenticationState(new UserSession());
+        // Tu lógica de logout aquí
         NavigationManager.NavigateTo("/", true);
     }
 }

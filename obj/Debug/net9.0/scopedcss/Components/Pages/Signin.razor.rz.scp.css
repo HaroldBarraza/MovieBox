@@ -1,0 +1,402 @@
+.signin-container[b-k71v14h6hv] {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #0f0f1a 0%, #1a1a2e 100%);
+    position: relative;
+    overflow: hidden;
+}
+
+.signin-background[b-k71v14h6hv] {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000"><polygon fill="%236a11cb" fill-opacity="0.03" points="0,1000 1000,0 1000,1000"/><polygon fill="%232575fc" fill-opacity="0.03" points="0,0 0,1000 1000,0"/></svg>');
+    background-size: cover;
+}
+
+.background-overlay[b-k71v14h6hv] {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: radial-gradient(circle at 20% 80%, rgba(106, 17, 203, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(37, 117, 252, 0.1) 0%, transparent 50%);
+}
+
+.signin-content[b-k71v14h6hv] {
+    position: relative;
+    z-index: 2;
+    width: 100%;
+    max-width: 440px;
+    padding: 20px;
+}
+
+.signin-card[b-k71v14h6hv] {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(20px);
+    border-radius: 20px;
+    padding: 40px;
+    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.signin-header[b-k71v14h6hv] {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.logo h1[b-k71v14h6hv] {
+    font-size: 32px;
+    font-weight: 700;
+    background: linear-gradient(90deg, #6a11cb 0%, #2575fc 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    margin: 0 0 20px 0;
+}
+
+.signin-header h2[b-k71v14h6hv] {
+    color: #1a1a2e;
+    font-size: 28px;
+    font-weight: 600;
+    margin: 0 0 8px 0;
+}
+
+.signin-header p[b-k71v14h6hv] {
+    color: #6c757d;
+    font-size: 16px;
+    margin: 0;
+}
+
+.signin-form[b-k71v14h6hv] {
+    width: 100%;
+}
+
+.error-message[b-k71v14h6hv] {
+    background: rgba(231, 76, 60, 0.1);
+    border: 1px solid rgba(231, 76, 60, 0.3);
+    color: #e74c3c;
+    padding: 12px 16px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.error-icon[b-k71v14h6hv] {
+    margin-right: 8px;
+    font-size: 16px;
+}
+
+.form-group[b-k71v14h6hv] {
+    margin-bottom: 24px;
+    position: relative;
+}
+
+.form-label[b-k71v14h6hv] {
+    display: block;
+    color: #1a1a2e;
+    font-weight: 600;
+    margin-bottom: 8px;
+    font-size: 14px;
+}
+
+/* ESTILOS PARA LOS INPUTS */
+.form-input[b-k71v14h6hv] {
+    width: 100%;
+    padding: 14px 16px;
+    border: 2px solid #e9ecef;
+    border-radius: 12px;
+    font-size: 16px;
+    transition: all 0.3s ease;
+    background: white;
+    color: #1a1a2e;
+    font-family: inherit;
+    box-sizing: border-box;
+}
+
+.form-input:focus[b-k71v14h6hv] {
+    outline: none;
+    border-color: #6a11cb;
+    box-shadow: 0 0 0 3px rgba(106, 17, 203, 0.1);
+    background: white;
+}
+
+.form-input[b-k71v14h6hv]::placeholder {
+    color: #6c757d;
+    opacity: 1;
+}
+
+.form-input:hover[b-k71v14h6hv] {
+    border-color: #b0b3b8;
+}
+
+/* Estilos para inputs con error */
+.form-input.input-validation-error[b-k71v14h6hv] {
+    border-color: #e74c3c;
+    background: rgba(231, 76, 60, 0.02);
+}
+
+.form-input.input-validation-error:focus[b-k71v14h6hv] {
+    border-color: #e74c3c;
+    box-shadow: 0 0 0 3px rgba(231, 76, 60, 0.1);
+}
+
+.form-input.modified.valid[b-k71v14h6hv] {
+    border-color: #27ae60;
+}
+
+.form-input.modified.valid:focus[b-k71v14h6hv] {
+    border-color: #27ae60;
+    box-shadow: 0 0 0 3px rgba(39, 174, 96, 0.1);
+}
+
+/* ESTILOS PARA MENSAJES DE VALIDACIÓN */
+.validation-message[b-k71v14h6hv] {
+    color: #e74c3c;
+    font-size: 12px;
+    margin-top: 6px;
+    display: block;
+    font-weight: 500;
+}
+
+.valid .validation-message[b-k71v14h6hv] {
+    color: #27ae60;
+}
+
+/* Grupo de formulario con estados */
+.form-group.has-error .form-input[b-k71v14h6hv] {
+    border-color: #e74c3c;
+}
+
+.form-group.has-success .form-input[b-k71v14h6hv] {
+    border-color: #27ae60;
+}
+
+.form-group:focus-within .form-label[b-k71v14h6hv] {
+    color: #6a11cb;
+}
+
+.signin-btn[b-k71v14h6hv] {
+    width: 100%;
+    padding: 16px;
+    background: linear-gradient(90deg, #6a11cb 0%, #2575fc 100%);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 10px;
+    font-family: inherit;
+}
+
+.signin-btn:hover:not(:disabled)[b-k71v14h6hv] {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(106, 17, 203, 0.4);
+}
+
+.signin-btn:active:not(:disabled)[b-k71v14h6hv] {
+    transform: translateY(0);
+}
+
+.signin-btn:disabled[b-k71v14h6hv] {
+    opacity: 0.7;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.spinner[b-k71v14h6hv] {
+    width: 18px;
+    height: 18px;
+    border: 2px solid transparent;
+    border-top: 2px solid white;
+    border-radius: 50%;
+    animation: spin-b-k71v14h6hv 1s linear infinite;
+}
+
+@keyframes spin-b-k71v14h6hv {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.btn-icon[b-k71v14h6hv] {
+    font-size: 18px;
+}
+
+.signin-footer[b-k71v14h6hv] {
+    text-align: center;
+    margin-top: 24px;
+    padding-top: 24px;
+    border-top: 1px solid #e9ecef;
+}
+
+.footer-text[b-k71v14h6hv] {
+    color: #6c757d;
+    font-size: 14px;
+}
+
+.register-link[b-k71v14h6hv] {
+    color: #6a11cb;
+    text-decoration: none;
+    font-weight: 600;
+    transition: color 0.3s ease;
+}
+
+.register-link:hover[b-k71v14h6hv] {
+    color: #2575fc;
+    text-decoration: underline;
+}
+
+/* Mejoras para accesibilidad */
+.form-input:focus-visible[b-k71v14h6hv] {
+    outline: 2px solid #6a11cb;
+    outline-offset: 2px;
+}
+
+/* Estilos para el formulario completo */
+.edit-form[b-k71v14h6hv] {
+    width: 100%;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .signin-content[b-k71v14h6hv] {
+        padding: 15px;
+        max-width: 100%;
+    }
+    
+    .signin-card[b-k71v14h6hv] {
+        padding: 30px 25px;
+        margin: 20px;
+    }
+    
+    .logo h1[b-k71v14h6hv] {
+        font-size: 28px;
+    }
+    
+    .signin-header h2[b-k71v14h6hv] {
+        font-size: 24px;
+    }
+    
+    .form-input[b-k71v14h6hv] {
+        padding: 12px 14px;
+        font-size: 16px; /* Previene zoom en iOS */
+    }
+    
+    .signin-btn[b-k71v14h6hv] {
+        padding: 14px;
+    }
+}
+
+@media (max-width: 480px) {
+    .signin-card[b-k71v14h6hv] {
+        padding: 25px 20px;
+        margin: 15px;
+    }
+    
+    .logo h1[b-k71v14h6hv] {
+        font-size: 24px;
+    }
+    
+    .signin-header h2[b-k71v14h6hv] {
+        font-size: 22px;
+    }
+    
+    .signin-header p[b-k71v14h6hv] {
+        font-size: 14px;
+    }
+    
+    .form-input[b-k71v14h6hv] {
+        padding: 12px;
+    }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+    .signin-card[b-k71v14h6hv] {
+        background: rgba(26, 26, 46, 0.95);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .signin-header h2[b-k71v14h6hv],
+    .form-label[b-k71v14h6hv] {
+        color: #ffffff;
+    }
+    
+    .form-input[b-k71v14h6hv] {
+        background: rgba(255, 255, 255, 0.1);
+        border-color: rgba(255, 255, 255, 0.2);
+        color: #ffffff;
+    }
+    
+    .form-input[b-k71v14h6hv]::placeholder {
+        color: #b0b3b8;
+    }
+    
+    .form-input:focus[b-k71v14h6hv] {
+        border-color: #6a11cb;
+        background: rgba(255, 255, 255, 0.15);
+        color: #ffffff;
+    }
+    
+    .form-input:hover[b-k71v14h6hv] {
+        border-color: rgba(255, 255, 255, 0.3);
+    }
+    
+    .footer-text[b-k71v14h6hv] {
+        color: #b0b3b8;
+    }
+    
+    .validation-message[b-k71v14h6hv] {
+        color: #ff6b6b;
+    }
+}
+
+/* Estilos específicos para Blazor Validation */
+[b-k71v14h6hv] .validation-message {
+    color: #e74c3c;
+    font-size: 12px;
+    font-weight: 500;
+    margin-top: 6px;
+    display: block;
+}
+
+[b-k71v14h6hv] .valid .validation-message {
+    color: #27ae60;
+}
+
+/* Mejora para inputs de tipo password */
+input[type="password"].form-input[b-k71v14h6hv] {
+    letter-spacing: 1px;
+}
+
+/* Iconos dentro de inputs (para futuras mejoras) */
+.input-with-icon[b-k71v14h6hv] {
+    position: relative;
+}
+
+.input-icon[b-k71v14h6hv] {
+    position: absolute;
+    left: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #6c757d;
+    font-size: 18px;
+}
+
+.input-with-icon .form-input[b-k71v14h6hv] {
+    padding-left: 48px;
+}

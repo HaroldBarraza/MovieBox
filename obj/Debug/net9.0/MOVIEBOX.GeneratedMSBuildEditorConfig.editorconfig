@@ -32,28 +32,8 @@ build_property.EnableCodeStyleSeverity =
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xBcHAucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 
 
-[E:/BYU/code/Next.js/MovieBox/Components/Pages/EditMovie.razor]
-build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYWdlc1xFZGl0TW92aWUucmF6b3I=
-build_metadata.AdditionalFiles.CssScope = 
-
 [E:/BYU/code/Next.js/MovieBox/Components/Pages/Home.razor]
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYWdlc1xIb21lLnJhem9y
-build_metadata.AdditionalFiles.CssScope = 
-
-[E:/BYU/code/Next.js/MovieBox/Components/Pages/Movies.razor]
-build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYWdlc1xNb3ZpZXMucmF6b3I=
-build_metadata.AdditionalFiles.CssScope = 
-
-[E:/BYU/code/Next.js/MovieBox/Components/Pages/MoviesCRUD.razor]
-build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYWdlc1xNb3ZpZXNDUlVELnJhem9y
-build_metadata.AdditionalFiles.CssScope = 
-
-[E:/BYU/code/Next.js/MovieBox/Components/Pages/Register.razor]
-build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYWdlc1xSZWdpc3Rlci5yYXpvcg==
-build_metadata.AdditionalFiles.CssScope = 
-
-[E:/BYU/code/Next.js/MovieBox/Components/Pages/Signin.razor]
-build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYWdlc1xTaWduaW4ucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 
 
 [E:/BYU/code/Next.js/MovieBox/Components/Routes.razor]
@@ -71,3 +51,23 @@ build_metadata.AdditionalFiles.CssScope = b-vax6vgu8of
 [E:/BYU/code/Next.js/MovieBox/Components/Layout/NavMenu.razor]
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xMYXlvdXRcTmF2TWVudS5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = b-82ofgz4j9r
+
+[E:/BYU/code/Next.js/MovieBox/Components/Pages/EditMovie.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYWdlc1xFZGl0TW92aWUucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = b-6pu3z37kmm
+
+[E:/BYU/code/Next.js/MovieBox/Components/Pages/Movies.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYWdlc1xNb3ZpZXMucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = b-mrpw87po4z
+
+[E:/BYU/code/Next.js/MovieBox/Components/Pages/MoviesCRUD.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYWdlc1xNb3ZpZXNDUlVELnJhem9y
+build_metadata.AdditionalFiles.CssScope = b-nygfuf3v9q
+
+[E:/BYU/code/Next.js/MovieBox/Components/Pages/Register.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYWdlc1xSZWdpc3Rlci5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = b-4vppyfbuy4
+
+[E:/BYU/code/Next.js/MovieBox/Components/Pages/Signin.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYWdlc1xTaWduaW4ucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = b-k71v14h6hv
